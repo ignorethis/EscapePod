@@ -1,23 +1,6 @@
-﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static System.Environment;
 
 namespace Pp
 {
@@ -34,9 +17,12 @@ namespace Pp
             this.DataContext = vm;
         }
 
-        private void Add_Click(object sender, RoutedEventArgs e)
+        private async void Add_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => vm.AddPodcastAsync());
+            if (vm.SelectedSearchPodcast != null)
+            {
+                await vm.AddPodcastAsync();
+            }
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
@@ -44,14 +30,14 @@ namespace Pp
             vm.DeletePodcast();
         }
 
-        private void PlayOrPause_Click(object sender, RoutedEventArgs e)
+        private async void PlayOrPause_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => vm.PlayOrPauseAsync());
+            await vm.PlayOrPauseAsync();
         }
 
-        private void EpisodeList_DoubleClick(object sender, MouseButtonEventArgs e)
+        private async void EpisodeList_DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Task.Run(() => vm.PlayEpisode());
+            await vm.PlayEpisodeAsync();
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
@@ -63,19 +49,19 @@ namespace Pp
             vm.PreviousEpisode();
         }
 
-        private void Update_Click(object sender, RoutedEventArgs e)
+        private async void Update_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => vm.UpdateAllPodcastAsync());
+            await vm.UpdateAllPodcastAsync();
         }
 
         private void Last_Click(object sender, RoutedEventArgs e)
         {
-            vm.LastEpisode();
+            vm.SelectLastEpisode();
         }
 
         private void First_Click(object sender, RoutedEventArgs e)
         {
-            vm.FirstEpisode();
+            vm.SelectFirstEpisode();
         }
 
         private void ProgressBar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -86,6 +72,5 @@ namespace Pp
 
             vm.Seek(newValue);
         }
-
     }
 }

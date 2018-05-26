@@ -1,47 +1,83 @@
-﻿using Newtonsoft.Json;
+﻿using iPodcastSearch;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
-using NAudio;
-using NAudio.Wave;
-using System.Windows.Threading;
-using System.Windows;
-using System.Net;
-using System.Threading;
-using System.Net.Http;
 
 namespace Pp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private PodcastService podcastService = new PodcastService();
+
+        protected ObservableCollection<Podcast> podcasts;
         private Podcast selectedPodcast;
         private Episode selectedEpisode;
-        protected ObservableCollection<Podcast> podcasts;
-        private string url;
-        System.Timers.Timer episodeIsPlayingTimer = new System.Timers.Timer(1000);
+
+        private iTunesSearchClient client;
+        private string searchString;
+        private ObservableCollection<iPodcastSearch.Models.Podcast> searchPodcasts;
+        private iPodcastSearch.Models.Podcast selectedSearchPodcast;
+
+        Timer episodeIsPlayingTimer = new Timer(1000);
         IWavePlayer waveOutDevice = new WaveOut();
         AudioFileReader audioFileReader;
         private float volume;
 
         public MainWindowViewModel()
         {
+            var myLock = new object();
+
             podcasts = new ObservableCollection<Podcast>(podcastService.LoadFromDisk());
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(podcasts, myLock);
+            selectedPodcast = SelectedEpisode?.Podcast;
+            selectedEpisode = LastPlayed();
+
+            client = new iTunesSearchClient();
+            searchString = string.Empty;
+
+            searchPodcasts = new ObservableCollection<iPodcastSearch.Models.Podcast>();
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(searchPodcasts, myLock);
+            selectedSearchPodcast = null;
+
             episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
+            Volume = 1.0f;
         }
 
+        public string SearchPlaceholder
+        {
+            get
+            {
+                return "Search for podcasts";
+            }
+        }
 
         public bool IsPlaying
         {
             get
             {
                 return this.waveOutDevice.PlaybackState == PlaybackState.Playing;
+            }
+        }
+
+        public int SearchListBoxIndex
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(SearchString) || SearchString == SearchPlaceholder)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
             }
         }
 
@@ -115,25 +151,29 @@ namespace Pp
             {
                 selectedEpisode = value;
                 this.OnPropertyChanged(nameof(SelectedEpisode));
-
-                if (value != null && File.Exists(selectedEpisode.LocalPath))
-                {
-                    audioFileReader = new AudioFileReader(selectedEpisode.LocalPath);
-                }
             }
         }
 
-        public string Url
+        public string SearchString
         {
             get
             {
-                return url;
+                return searchString;
             }
 
             set
             {
-                url = value;
-                this.OnPropertyChanged(nameof(Url));
+                searchString = value;
+
+                this.OnPropertyChanged(nameof(SearchString));
+                this.OnPropertyChanged(nameof(SearchListBoxIndex));
+
+                if (searchString == SearchPlaceholder)
+                {
+                    return;
+                }
+
+                PodcastSearch(searchString).ConfigureAwait(true);
             }
         }
 
@@ -160,41 +200,41 @@ namespace Pp
         {
             foreach (var oldPodcast in Podcasts)
             {
-                if (oldPodcast.Url.AbsoluteUri == Url)
+                if (oldPodcast.Id == SelectedSearchPodcast.Id)
                 {
                     SelectedPodcast = oldPodcast;
                     return;
                 }
             }
 
-            var newPodcast = await podcastService.GetPodcastAsync(new Uri(Url)).ConfigureAwait(false);
+            var newFeedUri = new Uri(SelectedSearchPodcast.FeedUrl);
+            var newPodcast = await podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
 
             if (!Directory.Exists(newPodcast.LocalPodcastPath))
             {
                 Directory.CreateDirectory(newPodcast.LocalPodcastPath);
             }
 
-            await Application.Current.Dispatcher.InvokeAsync(() => this.Podcasts.Add(newPodcast));
-            podcastService.SaveToDisk(Podcasts.ToList());
+            this.Podcasts.Add(newPodcast);
+            podcastService.SaveToDisk(Podcasts);
             SelectedPodcast = newPodcast;
 
             //TODO hier noch bug fixen, dass bild erst gesetzt wird bevor es runtergeladen ist ... und dann crap binding exception kommt :C
             await podcastService.DownloadTitleCardAsync(newPodcast);
 
-            await Task.Run(() =>
-            {
-                podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
-                podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
-            });
+            await podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
+            await podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
+
+            this.SearchString = string.Empty;
         }
 
         public void DeletePodcast()
         {
             Podcasts.Remove(SelectedPodcast);
-            podcastService.SaveToDisk(Podcasts.ToList());
+            podcastService.SaveToDisk(Podcasts);
         }
 
-        public void PlayOrPauseAsync()
+        public async Task PlayOrPauseAsync()
         {
             if (IsPlaying)
             {
@@ -202,38 +242,44 @@ namespace Pp
             }
             else
             {
-                PlayEpisode();
+                await PlayEpisodeAsync();
             }
         }
 
-        public async void PlayEpisode()
+        public async Task PlayEpisodeAsync()
         {
             if (IsPlaying)
             {
                 return;
             }
 
-            if (SelectedEpisode.IsDownloaded == false && SelectedEpisode.LocalPath == null)
+            if (!SelectedEpisode.IsDownloaded)
             {
-                await podcastService.DownloadEpisodeAsync(SelectedEpisode);
+                await podcastService.DownloadEpisodeAsync(this.SelectedEpisode);
+                //await StreamEpisodeAsync(SelectedEpisode);
             }
-            
+
+            audioFileReader = new AudioFileReader(selectedEpisode.LocalPath);
             waveOutDevice.Init(audioFileReader);
             audioFileReader.CurrentTime = TimeSpan.FromSeconds(SelectedEpisode.Timestamp);
             EpisodeLength = audioFileReader.TotalTime.TotalSeconds;
             audioFileReader.Volume = Volume;
             waveOutDevice.Play();
             episodeIsPlayingTimer.Start();
-            
-            
+
             this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
 
-        private void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (SelectedEpisode == null)
+            {
+                return;
+            }
+
             SelectedEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
 
-            if (audioFileReader.CurrentTime.TotalSeconds > audioFileReader.CurrentTime.TotalSeconds * 0.8)
+            if (audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
             {
                 var nextIndex = SelectedPodcast.EpisodeList.IndexOf(SelectedEpisode) - 1;
 
@@ -243,14 +289,15 @@ namespace Pp
 
                     if (!nextEpisode.IsDownloading)
                     {
-                        Task.Run(async () =>
-                        {
-                            await podcastService.DownloadEpisodeAsync(nextEpisode);
-                            nextEpisode.IsDownloading = false;
-                            nextEpisode.IsDownloaded = true;
-                        }).ConfigureAwait(false);
+                        await podcastService.DownloadEpisodeAsync(nextEpisode);
+                        nextEpisode.IsDownloading = false;
+                        nextEpisode.IsDownloaded = true;
                     }
                 }
+            }
+            if (audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.95))
+            {
+                SelectedEpisode.EpisodeFinished = true;
             }
         }
 
@@ -260,7 +307,10 @@ namespace Pp
             waveOutDevice.Pause();
             SelectedEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
             SelectedEpisode.LastPlayed = DateTime.Now;
-            podcastService.SaveToDisk(Podcasts.ToList());
+
+            podcastService.SaveToDisk(Podcasts);
+
+            this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
 
         public void NextEpisode()
@@ -281,13 +331,6 @@ namespace Pp
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
         public async Task UpdateAllPodcastAsync()
         {
             var oldSelectedPodcastUrl = this.SelectedPodcast.Url;
@@ -304,10 +347,10 @@ namespace Pp
                 updatedPodcasts.Add(updatedPodcast);
             }
 
-            await Application.Current.Dispatcher.InvokeAsync(() =>this.Podcasts.Clear());
+            this.Podcasts.Clear();
             foreach (var updatedPodcast in updatedPodcasts)
             {
-                await Application.Current.Dispatcher.InvokeAsync(() => this.Podcasts.Add(updatedPodcast));
+                this.Podcasts.Add(updatedPodcast);
             }
 
             this.SelectedPodcast = this.Podcasts.FirstOrDefault(p => p.Url == oldSelectedPodcastUrl);
@@ -317,10 +360,10 @@ namespace Pp
                 this.SelectedEpisode = this.SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
             }
 
-            podcastService.SaveToDisk(Podcasts.ToList());
+            podcastService.SaveToDisk(Podcasts);
         }
 
-        public void FirstEpisode()
+        public void SelectFirstEpisode()
         {
             if (SelectedPodcast == null)
             {
@@ -330,7 +373,7 @@ namespace Pp
             SelectedEpisode = SelectedPodcast.EpisodeList.Last();
         }
 
-        public void LastEpisode()
+        public void SelectLastEpisode()
         {
             if (SelectedPodcast == null)
             {
@@ -354,6 +397,123 @@ namespace Pp
 
             SelectedEpisode.Timestamp = timestamp;
             audioFileReader.CurrentTime = TimeSpan.FromSeconds(timestamp);
+        }
+
+        public async Task StreamEpisodeAsync(Episode current)
+        {
+            var memoryStream = new MemoryStream();
+
+            var mp3Stream = await new HttpClient().GetStreamAsync(current.EpisodeUri);
+            var mp3ChunkBuffer = new byte[4]; //hier kommen unsere 4 bytes immer rein :D
+
+            using (var fileStream = new FileStream(current.LocalPath, FileMode.Create, FileAccess.Write)) //und der crap muss ja auch gespeichert werden
+            {
+                while (mp3Stream.Read(mp3ChunkBuffer, 0, 4) > 0) //4er bytes lesen bis nix mehr kommt (falls du skippen musst, vergiss nicht den geskipten part auch in die file zu schreiben)
+                {
+                    memoryStream.Write(mp3ChunkBuffer, 0, mp3ChunkBuffer.Length);
+                    fileStream.Write(mp3ChunkBuffer, 0, mp3ChunkBuffer.Length); //schreib den chunck in die datei
+                }
+            }
+
+            mp3Stream.Close();
+
+            var readFullyStream = new ReadFullyStream(memoryStream);
+            var frame = Mp3Frame.LoadFromStream(readFullyStream);
+            IMp3FrameDecompressor decompressor = CreateFrameDecompressor(frame);
+            BufferedWaveProvider bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat);
+            bufferedWaveProvider.BufferDuration = TimeSpan.FromSeconds(20);
+
+            var buffer = new byte[16384 * 4];
+            int decompressed = decompressor.DecompressFrame(frame, buffer, 0);
+            bufferedWaveProvider.AddSamples(buffer, 0, decompressed);
+        }
+
+        /* private bool IsBufferNearlyFull
+        {
+            
+            if (bufferedWaveProvider != null && (bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes<bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 4))
+	        {
+                return true;
+	        } 
+            
+        } */
+
+        private static IMp3FrameDecompressor CreateFrameDecompressor(Mp3Frame frame)
+        {
+            WaveFormat waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2,
+                frame.FrameLength, frame.BitRate);
+            return new AcmMp3FrameDecompressor(waveFormat);
+        }
+
+        public Episode LastPlayed()
+        {
+            Episode hi = null;
+            foreach (Podcast p in podcasts)
+            {
+                foreach (Episode e in p.EpisodeList)
+                {
+                    if (e.LastPlayed != null)
+                    {
+                        if (hi == null)
+                        {
+                            hi = e;
+                        }
+                        else if (e.LastPlayed > hi.LastPlayed)
+                        {
+                            hi = e;
+                        }
+                    }
+                }
+            }
+            return hi;
+        }
+
+        public async Task PodcastSearch(string query)
+        {
+            var results = await this.client.SearchPodcastsAsync(query);
+            var orderedResults = results.OrderBy(x => x.Name);
+
+            SearchPodcasts.Clear();
+
+            foreach (var item in orderedResults)
+            {
+                SearchPodcasts.Add(item);
+            }
+        }
+       
+        public ObservableCollection<iPodcastSearch.Models.Podcast> SearchPodcasts
+        {
+            get
+            {
+                return searchPodcasts;
+            }
+
+            set
+            {
+                searchPodcasts = value;
+                this.OnPropertyChanged(nameof(SearchPodcasts));
+            }
+        }
+
+        public iPodcastSearch.Models.Podcast SelectedSearchPodcast
+        {
+            get
+            {
+                return selectedSearchPodcast;
+            }
+
+            set
+            {
+                selectedSearchPodcast = value;
+                this.OnPropertyChanged(nameof(SelectedSearchPodcast));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

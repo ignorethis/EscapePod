@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Pp
 {
     public class TextBoxWithPlaceholder : TextBox
     {
-        private string placeholder;
-
         public TextBoxWithPlaceholder()
         {
             GotFocus += TextBoxWithPlaceholder_GotFocus;
@@ -18,15 +13,15 @@ namespace Pp
             Loaded += TextBoxWithPlaceholder_Loaded;
         }
 
-        private void TextBoxWithPlaceholder_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private void TextBoxWithPlaceholder_Loaded(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Text))
             {
-                Text = placeholder;
+                Text = Placeholder;
             }
         }
 
-        private void TextBoxWithPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)
+        private void TextBoxWithPlaceholder_GotFocus(object sender, RoutedEventArgs e)
         {
             if (Text == Placeholder)
             {
@@ -34,7 +29,7 @@ namespace Pp
             }
         }
 
-        private void TextBoxWithPlaceholder_LostFocus(object sender, System.Windows.RoutedEventArgs e)
+        private void TextBoxWithPlaceholder_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Text))
             {
@@ -46,13 +41,15 @@ namespace Pp
         {
             get
             {
-                return placeholder;
+                return (string)GetValue(PlaceholderProperty);
             }
 
             set
             {
-                placeholder = value;
+                SetValue(PlaceholderProperty, value);
             }
         }
+
+        public static readonly DependencyProperty PlaceholderProperty = DependencyProperty.Register("Placeholder", typeof(String), typeof(TextBoxWithPlaceholder));
     }
 }

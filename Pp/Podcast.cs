@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pp
 {
     public class Podcast : INotifyPropertyChanged
     {
-        public Podcast()
-        {
-        }
-
         private Uri url;
         private string name;
         private Uri titleCard;
         private string localTitleCardPath;
-        private List<Episode> episodeList;
         private string localPodcastPath;
+        private string author;
+        private string subtitle;
+        private string description;
+        private Uri website;
+        private bool isExplicid;
+        private string language;
+        private string copyright;
+        private int episodeCount;
+        private DateTime lastUpdate;
+        private long id;
+        private List<Episode> episodeList = new List<Episode>();
         
         public string Name
         {
@@ -101,6 +104,146 @@ namespace Pp
             {
                 localPodcastPath = value;
                 this.OnPropertyChanged(nameof(LocalPodcastPath));
+            }
+        }
+
+        public string Author
+        {
+            get
+            {
+                return author;
+            }
+
+            set
+            {
+                author = value;
+                this.OnPropertyChanged(nameof(Author));
+            }
+        }
+
+        public string Subtitle
+        {
+            get
+            {
+                return subtitle;
+            }
+
+            set
+            {
+                subtitle = value;
+                this.OnPropertyChanged(nameof(Subtitle));
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return description;
+            }
+
+            set
+            {
+                description = value;
+                this.OnPropertyChanged(nameof(Description));
+            }
+        }
+
+        public Uri Website
+        {
+            get
+            {
+                return website;
+            }
+
+            set
+            {
+                website = value;
+                this.OnPropertyChanged(nameof(Website));
+            }
+        }
+
+        public bool IsExplicid
+        {
+            get
+            {
+                return isExplicid;
+            }
+
+            set
+            {
+                isExplicid = value;
+                this.OnPropertyChanged(nameof(IsExplicid));
+            }
+        }
+
+        public string Language
+        {
+            get
+            {
+                return language;
+            }
+
+            set
+            {
+                language = value;
+                this.OnPropertyChanged(nameof(Language));
+            }
+        }
+
+        public string Copyright
+        {
+            get
+            {
+                return copyright;
+            }
+
+            set
+            {
+                copyright = value;
+                this.OnPropertyChanged(nameof(Copyright));
+            }
+        }
+
+        public int EpisodeCount
+        {
+            get
+            {
+                return episodeCount;
+            }
+
+            set
+            {
+                episodeCount = value;
+                this.OnPropertyChanged(nameof(EpisodeCount));
+            }
+        }
+
+        public DateTime LastUpdate
+        {
+            get
+            {
+                return lastUpdate;
+            }
+
+            set
+            {
+                lastUpdate = value;
+                this.OnPropertyChanged(nameof(LastUpdate));
+            }
+        }
+
+        public long Id
+        {
+            get
+            {
+                return id;
+            }
+
+            set
+            {
+                id = value;
+                this.OnPropertyChanged(nameof(Id));
             }
         }
 

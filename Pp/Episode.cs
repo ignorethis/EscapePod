@@ -1,30 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pp
 {
     public class Episode : INotifyPropertyChanged
     {
-        public Episode(Podcast podcast, string episodeName, int episodeNumber, Uri episodeUri, string description, double timestamp, DateTime? publishDate)
-        {
-            this.podcast = podcast;
-            this.episodeName = episodeName;
-            this.episodeNumber = episodeNumber;
-            this.episodeUri = episodeUri;
-            this.description = description;
-            this.timestamp = timestamp;
-            this.isDownloading = false;
-            this.isDownloaded = false;
-            this.publishDate = publishDate;
-        }
-
         private string episodeName;
-        private int episodeNumber;
         private Uri episodeUri;
         private string localPath;
         private string description;
@@ -35,6 +17,47 @@ namespace Pp
         private DateTime? publishDate;
         private Podcast podcast;
         private double episodeLength;
+        private bool episodeFinished;
+        private string subtitle;
+        private string author;
+        private bool isExplicid;
+        private string summary;
+        private Uri imageUri;
+        private string audioFileType;
+        private string audioFileSize;
+
+        public Episode(Podcast podcast, string episodeName, string episodeUri, string description, double timestamp, DateTime? publishDate, string episodeLength, string subtitle, string author, bool isExplicid, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
+        {
+            this.podcast = podcast;
+            this.episodeName = episodeName;
+            this.episodeUri = new Uri(episodeUri);
+            this.description = description;
+            this.timestamp = timestamp;
+            this.isDownloading = false;
+            this.isDownloaded = false;
+            this.publishDate = publishDate;
+            this.episodeFinished = false;
+
+            var couldParseDuration = TimeSpan.TryParse(episodeLength, out TimeSpan duration);
+            if (couldParseDuration)
+            {
+                this.episodeLength = duration.TotalSeconds;
+            }
+            else
+            {
+                this.episodeLength = 0.0;
+            }
+
+            this.subtitle = subtitle;
+            this.author = author;
+            this.isExplicid = isExplicid;
+            this.summary = summary;
+            this.imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
+            this.audioFileSize = audioFileSize;
+            this.audioFileType = audioFileType;
+            this.isDownloaded = isDownloaded;
+            this.localPath = localPath;
+        }
 
         [JsonIgnore]
         public Podcast Podcast
@@ -43,7 +66,6 @@ namespace Pp
             {
                 return podcast;
             }
-
             set
             {
                 podcast = value;
@@ -57,26 +79,6 @@ namespace Pp
             {
                 return episodeName;
             }
-
-            set
-            {
-                episodeName = value;
-                this.OnPropertyChanged(nameof(EpisodeName));
-            }
-        }
-
-        public int EpisodeNumber
-        {
-            get
-            {
-                return episodeNumber;
-            }
-
-            set
-            {
-                episodeNumber = value;
-                this.OnPropertyChanged(nameof(EpisodeNumber));
-            }
         }
 
         public Uri EpisodeUri
@@ -84,12 +86,6 @@ namespace Pp
             get
             {
                 return episodeUri;
-            }
-
-            set
-            {
-                episodeUri = value;
-                this.OnPropertyChanged(nameof(EpisodeUri));
             }
         }
 
@@ -99,21 +95,15 @@ namespace Pp
             {
                 return description;
             }
-
-            set
-            {
-                description = value;
-                this.OnPropertyChanged(nameof(Description));
-            }
         }
 
+        [JsonIgnore]
         public bool IsDownloading
         {
             get
             {
                 return isDownloading;
             }
-
             set
             {
                 isDownloading = value;
@@ -127,7 +117,6 @@ namespace Pp
             {
                 return isDownloaded;
             }
-
             set
             {
                 isDownloaded = value;
@@ -141,7 +130,6 @@ namespace Pp
             {
                 return timestamp;
             }
-
             set
             {
                 timestamp = value;
@@ -155,7 +143,6 @@ namespace Pp
             {
                 return lastPlayed;
             }
-
             set
             {
                 lastPlayed = value;
@@ -169,12 +156,6 @@ namespace Pp
             {
                 return publishDate;
             }
-
-            set
-            {
-                publishDate = value;
-                this.OnPropertyChanged(nameof(PublishDate));
-            }
         }
 
         public string LocalPath
@@ -183,7 +164,6 @@ namespace Pp
             {
                 return localPath;
             }
-
             set
             {
                 localPath = value;
@@ -197,11 +177,79 @@ namespace Pp
             {
                 return episodeLength;
             }
-
             set
             {
                 episodeLength = value;
                 this.OnPropertyChanged(nameof(EpisodeLength));
+            }
+        }
+
+        public bool EpisodeFinished
+        {
+            get
+            {
+                return episodeFinished;
+            }
+            set
+            {
+                episodeFinished = value;
+                this.OnPropertyChanged(nameof(EpisodeFinished));
+            }
+        }
+
+        public string Subtitle
+        {
+            get
+            {
+                return subtitle;
+            }
+        }
+
+        public string Author
+        {
+            get
+            {
+                return author;
+            }
+        }
+
+        public bool IsExplicid
+        {
+            get
+            {
+                return isExplicid;
+            }
+        }
+
+        public string Summary
+        {
+            get
+            {
+                return summary;
+            }
+        }
+
+        public Uri ImageUri
+        {
+            get
+            {
+                return imageUri;
+            }
+        }
+
+        public string AudioFileType
+        {
+            get
+            {
+                return audioFileType;
+            }
+        }
+
+        public string AudioFileSize
+        {
+            get
+            {
+                return audioFileSize;
             }
         }
 
