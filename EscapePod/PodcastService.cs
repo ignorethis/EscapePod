@@ -15,12 +15,18 @@ namespace Pp
         private string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", "savefile.json");
         private HttpClient httpClient = new HttpClient();
 
+        public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string query)
+        {
+            var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
+            return await podcastFinder.SearchPodcastsAsync(query)
+                .ConfigureAwait(false);
+        }
+
         public async Task<Podcast> GetPodcastAsync(Uri podcastUrl)
         {
-            iTunesPodcastFinder.PodcastFinder client = new iTunesPodcastFinder.PodcastFinder();
-            var getPodcastWithEpisodesResult = await client.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
-            Podcast podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
-            return podcast;
+            var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
+            var getPodcastWithEpisodesResult = await podcastFinder.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
+            return PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
 
             /*
             string podcastTitle = podcast.Name;

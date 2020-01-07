@@ -20,7 +20,6 @@ namespace Pp
         private Podcast selectedPodcast;
         private Episode selectedEpisode;
 
-        private PodcastFinder client;
         private string searchString;
         private ObservableCollection<iTunesPodcastFinder.Models.Podcast> searchPodcasts;
         private iTunesPodcastFinder.Models.Podcast selectedSearchPodcast;
@@ -39,7 +38,6 @@ namespace Pp
             selectedPodcast = SelectedEpisode?.Podcast;
             selectedEpisode = LastPlayed();
 
-            client = new PodcastFinder();
             searchString = string.Empty;
 
             searchPodcasts = new ObservableCollection<iTunesPodcastFinder.Models.Podcast>();
@@ -470,7 +468,7 @@ namespace Pp
 
         public async Task PodcastSearch(string query)
         {
-            var results = await this.client.SearchPodcastsAsync(query);
+            var results = await this.podcastService.SearchPodcastAsync(query);
             var orderedResults = results.OrderBy(x => x.Name);
 
             SearchPodcasts.Clear();
