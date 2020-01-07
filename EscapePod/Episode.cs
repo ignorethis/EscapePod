@@ -26,27 +26,18 @@ namespace Pp
         private string audioFileType;
         private string audioFileSize;
 
-        public Episode(Podcast podcast, string episodeName, string episodeUri, string description, double timestamp, DateTime? publishDate, string episodeLength, string subtitle, string author, bool isExplicid, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
+        public Episode(Podcast podcast, string episodeName, Uri episodeUri, string description, double timestamp, DateTime? publishDate, TimeSpan duration, string subtitle, string author, bool isExplicid, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
         {
             this.podcast = podcast;
             this.episodeName = episodeName;
-            this.episodeUri = new Uri(episodeUri);
+            this.episodeUri = episodeUri;
             this.description = description;
             this.timestamp = timestamp;
             this.isDownloading = false;
             this.isDownloaded = false;
             this.publishDate = publishDate;
             this.episodeFinished = false;
-
-            var couldParseDuration = TimeSpan.TryParse(episodeLength, out TimeSpan duration);
-            if (couldParseDuration)
-            {
-                this.episodeLength = duration.TotalSeconds;
-            }
-            else
-            {
-                this.episodeLength = 0.0;
-            }
+            this.episodeLength = duration.TotalSeconds;
 
             this.subtitle = subtitle;
             this.author = author;

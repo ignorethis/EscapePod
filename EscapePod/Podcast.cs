@@ -20,7 +20,7 @@ namespace Pp
         private string copyright;
         private int episodeCount;
         private DateTime lastUpdate;
-        private long id;
+        private string id;
         private List<Episode> episodeList = new List<Episode>();
         
         public string Name
@@ -233,7 +233,7 @@ namespace Pp
             }
         }
 
-        public long Id
+        public string Id
         {
             get
             {

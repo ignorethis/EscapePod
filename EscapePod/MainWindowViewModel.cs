@@ -1,4 +1,4 @@
-﻿using iPodcastSearch;
+﻿using iTunesPodcastFinder;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,13 @@ namespace Pp
         private Podcast selectedPodcast;
         private Episode selectedEpisode;
 
-        private iTunesSearchClient client;
+        private PodcastFinder client;
         private string searchString;
-        private ObservableCollection<iPodcastSearch.Models.Podcast> searchPodcasts;
-        private iPodcastSearch.Models.Podcast selectedSearchPodcast;
+        private ObservableCollection<iTunesPodcastFinder.Models.Podcast> searchPodcasts;
+        private iTunesPodcastFinder.Models.Podcast selectedSearchPodcast;
 
         Timer episodeIsPlayingTimer = new Timer(1000);
-        IWavePlayer waveOutDevice = new WaveOut();
+        IWavePlayer waveOutDevice = new WaveOutEvent();
         AudioFileReader audioFileReader;
         private float volume;
 
@@ -39,10 +39,10 @@ namespace Pp
             selectedPodcast = SelectedEpisode?.Podcast;
             selectedEpisode = LastPlayed();
 
-            client = new iTunesSearchClient();
+            client = new PodcastFinder();
             searchString = string.Empty;
 
-            searchPodcasts = new ObservableCollection<iPodcastSearch.Models.Podcast>();
+            searchPodcasts = new ObservableCollection<iTunesPodcastFinder.Models.Podcast>();
             System.Windows.Data.BindingOperations.EnableCollectionSynchronization(searchPodcasts, myLock);
             selectedSearchPodcast = null;
 
@@ -200,7 +200,7 @@ namespace Pp
         {
             foreach (var oldPodcast in Podcasts)
             {
-                if (oldPodcast.Id == SelectedSearchPodcast.Id)
+                if (oldPodcast.Id == SelectedSearchPodcast.ItunesId)
                 {
                     SelectedPodcast = oldPodcast;
                     return;
@@ -481,7 +481,7 @@ namespace Pp
             }
         }
        
-        public ObservableCollection<iPodcastSearch.Models.Podcast> SearchPodcasts
+        public ObservableCollection<iTunesPodcastFinder.Models.Podcast> SearchPodcasts
         {
             get
             {
@@ -495,7 +495,7 @@ namespace Pp
             }
         }
 
-        public iPodcastSearch.Models.Podcast SelectedSearchPodcast
+        public iTunesPodcastFinder.Models.Podcast SelectedSearchPodcast
         {
             get
             {

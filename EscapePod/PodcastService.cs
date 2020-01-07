@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using iPodcastSearch;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,9 +17,9 @@ namespace Pp
 
         public async Task<Podcast> GetPodcastAsync(Uri podcastUrl)
         {
-            iTunesSearchClient client = new iTunesSearchClient();
-            var pod = await client.GetPodcastFromFeedUrlAsyc(podcastUrl.AbsoluteUri);
-            Podcast podcast = PodcastConversion(pod);
+            iTunesPodcastFinder.PodcastFinder client = new iTunesPodcastFinder.PodcastFinder();
+            var getPodcastWithEpisodesResult = await client.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
+            Podcast podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
             return podcast;
 
             /*
@@ -204,7 +203,7 @@ namespace Pp
             return descriptionText;
         }
 
-        public Podcast PodcastConversion(iPodcastSearch.Models.Podcast outerPodcast)
+        public Podcast PodcastConversion(iTunesPodcastFinder.Models.Podcast outerPodcast, IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
         {
             var invalidChars = Path.GetInvalidPathChars();
             var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars));
@@ -213,23 +212,23 @@ namespace Pp
             {
                 Name = outerPodcast.Name,
                 Url = new Uri(outerPodcast.FeedUrl),
-                TitleCard = new Uri(outerPodcast.Image),
-                Author = outerPodcast.Author,
-                Subtitle = outerPodcast.SubTitle,
-                Description = outerPodcast.Description,
-                Website = new Uri(outerPodcast.Website),
-                IsExplicid = outerPodcast.IsExplicit,
-                Language = outerPodcast.Language,
-                Copyright = outerPodcast.Copyright,
-                EpisodeCount = outerPodcast.EpisodeCount,
-                LastUpdate = outerPodcast.LastUpdate,
-                Id = outerPodcast.Id,
+                TitleCard = new Uri(outerPodcast.ArtWork),
+                Author = outerPodcast.Editor,
+                Subtitle = string.Empty, //TODO find replacement
+                Description = outerPodcast.Summary,
+                Website = new Uri(outerPodcast.ItunesLink),
+                IsExplicid = false,
+                Language = string.Empty, //TODO find replacement
+                Copyright = string.Empty, //TODO find replacement
+                EpisodeCount = outerPodcast.EpisodesCount,
+                LastUpdate = DateTime.MinValue, //TODO find replacement
+                Id = outerPodcast.ItunesId,
                 LocalPodcastPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
             };
 
-            foreach (var episode in outerPodcast.Episodes)
+            foreach (var episode in podcastEpisodes)
             {
-                var newEpisode = new Episode(result, episode.Title, episode.Link, episode.Description, 0.0, episode.PubDate, episode.Duration, episode.Subtitle, episode.Author, episode.IsExplicit, episode.Summary, episode.Image, episode.AudioFileSize, episode.AudioFileType, false, string.Empty);
+                var newEpisode = new Episode(result, episode.Title, episode.FileUrl, episode.Summary, 0.0, episode.PublishedDate, episode.Duration, episode.Title, episode.Editor, false, episode.Summary, string.Empty, string.Empty, string.Empty, false, string.Empty);
                 result.EpisodeList.Add(newEpisode);
             }
 

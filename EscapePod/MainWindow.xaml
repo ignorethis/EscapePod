@@ -6,7 +6,6 @@
         xmlns:loadin="clr-namespace:LoadingIndicators.WPF;assembly=LoadingIndicators.WPF"
         xmlns:local="clr-namespace:Pp"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         x:Class="Pp.MainWindow"
         mc:Ignorable="d"
         Title="EscapePod" 
