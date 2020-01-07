@@ -15,7 +15,7 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         Background="Black"
-        Icon="C:\Users\qa\Desktop\Pod\Pp\Pp\icon.ico"
+        Icon="/Resources/icon.ico"
         d:DataContext="{d:DesignInstance Type=local:DesignTimeViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions/>
