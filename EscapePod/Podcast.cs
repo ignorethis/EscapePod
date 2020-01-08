@@ -19,7 +19,7 @@ namespace Pp
         private string language;
         private string copyright;
         private int episodeCount;
-        private DateTime lastUpdate;
+        private DateTime? lastUpdate;
         private string id;
         private List<Episode> episodeList = new List<Episode>();
         
@@ -219,7 +219,7 @@ namespace Pp
             }
         }
 
-        public DateTime LastUpdate
+        public DateTime? LastUpdate
         {
             get
             {

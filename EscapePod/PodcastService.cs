@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Pp
 {
@@ -15,10 +16,10 @@ namespace Pp
         private string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", "savefile.json");
         private HttpClient httpClient = new HttpClient();
 
-        public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string query)
+        public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string searchValue)
         {
             var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
-            return await podcastFinder.SearchPodcastsAsync(query)
+            return await podcastFinder.SearchPodcastsAsync(searchValue)
                 .ConfigureAwait(false);
         }
 
@@ -26,7 +27,8 @@ namespace Pp
         {
             var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
             var getPodcastWithEpisodesResult = await podcastFinder.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
-            return PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
+            var podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
+            return podcast;
 
             /*
             string podcastTitle = podcast.Name;
@@ -91,10 +93,29 @@ namespace Pp
         {
             if (!File.Exists(episode.LocalPath) || !episode.IsDownloaded)
             {
-                var fileFullName = await DownloadFileAsync(episode.EpisodeUri, episode.Podcast.LocalPodcastPath, episode.EpisodeName, "mp3").ConfigureAwait(false);
+                var extension = GetExtensionFromMimeType(episode.AudioFileType);
+
+                var fileFullName = await DownloadFileAsync(episode.EpisodeUri, episode.Podcast.LocalPodcastPath, episode.EpisodeName, extension)
+                    .ConfigureAwait(false);
                 episode.LocalPath = fileFullName;
                 episode.IsDownloaded = true;
             }
+        }
+
+        //doc http://streaming.osu.edu/podcast/Example/Podcast.xml Podcast Supported Enclosures
+        private string GetExtensionFromMimeType(string mimeType)
+        {
+            return mimeType switch
+            {
+                "audio/mpeg" => ".mp3",
+                "audio/x-m4a" => ".m4a",
+                "audio/x-wav" => ".wav",
+                "audio/x-aiff" => ".aif",
+                "audio/x-pn-realaudio" => ".ra",
+                "audio/x-ms-wma" => ".wma",
+                "audio/midi" => ".mid",
+                _ => ".mp3"
+            };
         }
 
         public async Task DownloadTitleCardAsync(Podcast podcast)
@@ -211,35 +232,78 @@ namespace Pp
 
         public Podcast PodcastConversion(iTunesPodcastFinder.Models.Podcast outerPodcast, IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
         {
-            var invalidChars = Path.GetInvalidPathChars();
-            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars));
-
-            Podcast result = new Podcast()
-            {
-                Name = outerPodcast.Name,
-                Url = new Uri(outerPodcast.FeedUrl),
-                TitleCard = new Uri(outerPodcast.ArtWork),
-                Author = outerPodcast.Editor,
-                Subtitle = string.Empty, //TODO find replacement
-                Description = outerPodcast.Summary,
-                Website = new Uri(outerPodcast.ItunesLink),
-                IsExplicid = false,
-                Language = string.Empty, //TODO find replacement
-                Copyright = string.Empty, //TODO find replacement
-                EpisodeCount = outerPodcast.EpisodesCount,
-                LastUpdate = DateTime.MinValue, //TODO find replacement
-                Id = outerPodcast.ItunesId,
-                LocalPodcastPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
-            };
+            var result = GetPodcastFrom(outerPodcast);
 
             foreach (var episode in podcastEpisodes)
             {
-                var newEpisode = new Episode(result, episode.Title, episode.FileUrl, episode.Summary, 0.0, episode.PublishedDate, episode.Duration, episode.Title, episode.Editor, false, episode.Summary, string.Empty, string.Empty, string.Empty, false, string.Empty);
-                result.EpisodeList.Add(newEpisode);
+                result.EpisodeList.Add(GetEpisodeFrom(result, episode));
             }
 
             return result;
         }
 
+        private Podcast GetPodcastFrom(iTunesPodcastFinder.Models.Podcast outerPodcast)
+        {
+            var invalidChars = Path.GetInvalidPathChars();
+            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars));
+
+            var xml = XDocument.Parse("<podcast>" + outerPodcast.InnerXml + "</podcast>");
+            var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+
+            var descriptionValue = xml.Descendants(XName.Get("subtitle", itunesNs)).FirstOrDefault()?.Value;
+            var explicitValue = xml.Descendants(XName.Get("explicit", itunesNs)).FirstOrDefault()?.Value;
+            var languageValue = xml.Descendants("language").FirstOrDefault()?.Value;
+            var copyrightValue = xml.Descendants("copyright").FirstOrDefault()?.Value;
+            var lastBuildDateValue = xml.Descendants("lastBuildDate").FirstOrDefault()?.Value;
+
+            return new Podcast()
+            {
+                Name = outerPodcast.Name,
+                Url = new Uri(outerPodcast.FeedUrl),
+                TitleCard = new Uri(outerPodcast.ArtWork),
+                Author = outerPodcast.Editor,
+                Subtitle = descriptionValue,
+                Description = outerPodcast.Summary,
+                Website = new Uri(outerPodcast.ItunesLink),
+                IsExplicid = explicitValue != null && explicitValue == "yes" ? true : false,
+                Language = languageValue,
+                Copyright = copyrightValue,
+                EpisodeCount = outerPodcast.EpisodesCount,
+                LastUpdate = lastBuildDateValue == null ? (DateTime?)null : DateTime.Parse(lastBuildDateValue),
+                Id = outerPodcast.ItunesId,
+                LocalPodcastPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
+            };
+        }
+
+        private Episode GetEpisodeFrom(Podcast podcast, iTunesPodcastFinder.Models.PodcastEpisode episode)
+        {
+            var xml = XDocument.Parse("<episode>" + episode.InnerXml + "</episode>");
+            var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+            
+            var explicitValue = xml.Descendants(XName.Get("explicit", itunesNs)).FirstOrDefault()?.Value;
+            var imageValue = xml.Descendants(XName.Get("image", itunesNs)).FirstOrDefault()?.Attribute("href")?.Value;
+            var enclosure = xml.Descendants("enclosure").FirstOrDefault();
+            var byteLengthValue = enclosure?.Attribute("length")?.Value;
+            var audioFileTypeValue = enclosure?.Attribute("type")?.Value;
+
+            return new Episode(
+                podcast, 
+                episode.Title, 
+                episode.FileUrl, 
+                episode.Summary, 
+                0.0, 
+                episode.PublishedDate, 
+                episode.Duration, 
+                episode.Title, 
+                episode.Editor,
+                explicitValue != null && explicitValue == "yes" ? true : false,
+                episode.Summary, 
+                imageValue,
+                byteLengthValue,
+                audioFileTypeValue, 
+                false,
+                string.Empty
+            );
+        }
     }
 }
