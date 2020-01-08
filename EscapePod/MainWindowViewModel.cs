@@ -208,11 +208,6 @@ namespace Pp
             var newFeedUri = new Uri(SelectedSearchPodcast.FeedUrl);
             var newPodcast = await podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
 
-            if (!Directory.Exists(newPodcast.LocalPodcastPath))
-            {
-                Directory.CreateDirectory(newPodcast.LocalPodcastPath);
-            }
-
             this.Podcasts.Add(newPodcast);
             podcastService.SaveToDisk(Podcasts);
             SelectedPodcast = newPodcast;
@@ -246,15 +241,12 @@ namespace Pp
 
         public async Task PlayEpisodeAsync()
         {
-            if (IsPlaying)
-            {
-                return;
-            }
+            await podcastService.DownloadEpisodeAsync(this.SelectedEpisode);
 
-            if (!SelectedEpisode.IsDownloaded)
+            if (waveOutDevice.PlaybackState == PlaybackState.Playing 
+                || waveOutDevice.PlaybackState == PlaybackState.Paused)
             {
-                await podcastService.DownloadEpisodeAsync(this.SelectedEpisode);
-                //await StreamEpisodeAsync(SelectedEpisode);
+                waveOutDevice.Stop();
             }
 
             audioFileReader = new AudioFileReader(selectedEpisode.LocalPath);
