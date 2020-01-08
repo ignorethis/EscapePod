@@ -19,6 +19,7 @@ namespace Pp
         protected ObservableCollection<Podcast> podcasts;
         private Podcast selectedPodcast;
         private Episode selectedEpisode;
+        private Episode playingEpisode;
 
         private string searchString;
         private ObservableCollection<iTunesPodcastFinder.Models.Podcast> searchPodcasts;
@@ -118,6 +119,20 @@ namespace Pp
             {
                 selectedPodcast = value;
                 this.OnPropertyChanged(nameof(SelectedPodcast));
+            }
+        }
+
+        public Episode PlayingEpisode
+        {
+            get
+            {
+                return playingEpisode;
+            }
+
+            set
+            {
+                playingEpisode = value;
+                this.OnPropertyChanged(nameof(PlayingEpisode));
             }
         }
 
@@ -241,7 +256,13 @@ namespace Pp
 
         public async Task PlayEpisodeAsync()
         {
-            await podcastService.DownloadEpisodeAsync(this.SelectedEpisode);
+            if (PlayingEpisode == SelectedEpisode 
+                && waveOutDevice.PlaybackState == PlaybackState.Playing)
+            {
+                return;
+            }
+
+            await podcastService.DownloadEpisodeAsync(SelectedEpisode);
 
             if (waveOutDevice.PlaybackState == PlaybackState.Playing 
                 || waveOutDevice.PlaybackState == PlaybackState.Paused)
@@ -257,21 +278,23 @@ namespace Pp
             waveOutDevice.Play();
             episodeIsPlayingTimer.Start();
 
+            PlayingEpisode = SelectedEpisode;
+
             this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
 
         private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (SelectedEpisode == null)
+            if (PlayingEpisode == null)
             {
                 return;
             }
 
-            SelectedEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
+            PlayingEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
 
             if (audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
             {
-                var nextIndex = SelectedPodcast.EpisodeList.IndexOf(SelectedEpisode) - 1;
+                var nextIndex = SelectedPodcast.EpisodeList.IndexOf(PlayingEpisode) - 1;
 
                 if (nextIndex >= 0)
                 {
@@ -291,12 +314,12 @@ namespace Pp
             }
         }
 
-        public void PauseEpisode()
+        private void PauseEpisode()
         {
             episodeIsPlayingTimer.Stop();
             waveOutDevice.Pause();
-            SelectedEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
-            SelectedEpisode.LastPlayed = DateTime.Now;
+            PlayingEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
+            PlayingEpisode.LastPlayed = DateTime.Now;
 
             podcastService.SaveToDisk(Podcasts);
 

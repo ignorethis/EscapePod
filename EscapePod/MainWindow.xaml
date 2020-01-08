@@ -36,7 +36,7 @@
                 <TextBlock Text="{Binding SelectedEpisode.Description}" Foreground="White" TextWrapping="Wrap" Margin="5" TextAlignment="Center" />
             </ScrollViewer>
         </Grid>
-        <ProgressBar x:Name="progressBar" Grid.Row="1" Width="auto" Height="10" Value="{Binding SelectedEpisode.Timestamp}" Maximum="{Binding EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" Background="Black" Foreground="Gray"/>
+        <ProgressBar x:Name="progressBar" Grid.Row="1" Width="auto" Height="10" Value="{Binding PlayingEpisode.Timestamp}" Maximum="{Binding PlayingEpisode.EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" Background="Black" Foreground="Gray"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">
