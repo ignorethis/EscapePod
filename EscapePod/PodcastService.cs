@@ -145,6 +145,11 @@ namespace Pp
             var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var fileFullName = GetFileFullName(path, name, extension);
+            var directoryName = Path.GetDirectoryName(fileFullName);
+            if (!Directory.Exists(directoryName))
+            {
+                Directory.CreateDirectory(directoryName);
+            }
 
             using (var fileStream = new FileStream(fileFullName, FileMode.Create, FileAccess.Write))
             {
