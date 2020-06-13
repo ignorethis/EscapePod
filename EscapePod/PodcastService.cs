@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using iTunesPodcastFinder;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,15 @@ namespace Pp
 
         public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string searchValue)
         {
-            var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
+            var podcastFinder = new PodcastFinder();
             return await podcastFinder.SearchPodcastsAsync(searchValue)
                 .ConfigureAwait(false);
         }
 
         public async Task<Podcast> GetPodcastAsync(Uri podcastUrl)
         {
-            var podcastFinder = new iTunesPodcastFinder.PodcastFinder();
+            var podcastFinder = new PodcastFinder();
+            PodcastFinder.HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0");
             var getPodcastWithEpisodesResult = await podcastFinder.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
             var podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
             return podcast;
@@ -261,15 +263,19 @@ namespace Pp
             var copyrightValue = xml.Descendants("copyright").FirstOrDefault()?.Value;
             var lastBuildDateValue = xml.Descendants("lastBuildDate").FirstOrDefault()?.Value;
 
+            var validUri = Uri.TryCreate(outerPodcast.FeedUrl, UriKind.RelativeOrAbsolute, out Uri uri);
+            var validTitleCard = Uri.TryCreate(outerPodcast.ArtWork, UriKind.RelativeOrAbsolute, out Uri titleCardUri);
+            var validWebsite = Uri.TryCreate(outerPodcast.ItunesLink, UriKind.RelativeOrAbsolute, out Uri websiteUri);
+
             return new Podcast()
             {
                 Name = outerPodcast.Name,
-                Url = new Uri(outerPodcast.FeedUrl),
-                TitleCard = new Uri(outerPodcast.ArtWork),
+                Uri = validUri ? uri : null,
+                TitleCard = validTitleCard ? titleCardUri : null,
                 Author = outerPodcast.Editor,
                 Subtitle = descriptionValue,
                 Description = outerPodcast.Summary,
-                Website = new Uri(outerPodcast.ItunesLink),
+                Website = validWebsite ? websiteUri : null,
                 IsExplicid = explicitValue != null && explicitValue == "yes" ? true : false,
                 Language = languageValue,
                 Copyright = copyrightValue,

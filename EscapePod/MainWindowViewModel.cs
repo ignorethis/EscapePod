@@ -346,32 +346,33 @@ namespace Pp
 
         public async Task UpdateAllPodcastAsync()
         {
-            var oldSelectedPodcastUrl = this.SelectedPodcast.Url;
-            Uri oldSelectedEpisodeUri = null;
-            if (selectedEpisode != null)
-            {
-                oldSelectedEpisodeUri = this.SelectedEpisode.EpisodeUri;
-            }
+            //alten zustand merken
+            var oldSelectedPodcastUri = this.SelectedPodcast?.Uri;
+            var oldSelectedEpisodeUri = this.SelectedEpisode?.EpisodeUri;
 
+            //neuen stuff laden
             var updatedPodcasts = new List<Podcast>();
             for (int i = 0; i < Podcasts.Count; i++)
             {
-                var updatedPodcast = await podcastService.GetPodcastAsync(Podcasts[i].Url);
+                var updatedPodcast = await podcastService.GetPodcastAsync(Podcasts[i].Uri);
                 updatedPodcasts.Add(updatedPodcast);
             }
 
+            //das alte zerstoeren
             this.Podcasts.Clear();
             foreach (var updatedPodcast in updatedPodcasts)
             {
                 this.Podcasts.Add(updatedPodcast);
             }
 
-            this.SelectedPodcast = this.Podcasts.FirstOrDefault(p => p.Url == oldSelectedPodcastUrl);
+            //alten zustand wiederherstellen
+            this.SelectedPodcast = oldSelectedPodcastUri == null
+                ? null
+                : this.Podcasts.FirstOrDefault(p => p.Uri == oldSelectedPodcastUri);
 
-            if (oldSelectedEpisodeUri != null)
-            {
-                this.SelectedEpisode = this.SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
-            }
+            this.SelectedEpisode = oldSelectedEpisodeUri == null
+                ? null
+                : this.SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
 
             podcastService.SaveToDisk(Podcasts);
         }

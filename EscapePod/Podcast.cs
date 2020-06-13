@@ -6,7 +6,7 @@ namespace Pp
 {
     public class Podcast : INotifyPropertyChanged
     {
-        private Uri url;
+        private Uri uri;
         private string name;
         private Uri titleCard;
         private string localTitleCardPath;
@@ -65,17 +65,17 @@ namespace Pp
             }
         }
 
-        public Uri Url
+        public Uri Uri
         {
             get
             {
-                return url;
+                return uri;
             }
 
             set
             {
-                url = value;
-                this.OnPropertyChanged(nameof(Url));
+                uri = value;
+                this.OnPropertyChanged(nameof(Uri));
             }
         }
 
