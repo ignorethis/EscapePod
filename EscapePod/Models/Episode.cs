@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Pp
+namespace Pp.Models
 {
     public class Episode : INotifyPropertyChanged
     {

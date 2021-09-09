@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pp
+namespace Pp.Models
 {
     public class Link
     {
-        public string Url { get; set; }
         public string Text { get; set; }
+        public string Url { get; set; }
     }
 }

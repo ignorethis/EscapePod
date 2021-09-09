@@ -6,6 +6,7 @@
         xmlns:loadin="clr-namespace:LoadingIndicators.WPF;assembly=LoadingIndicators.WPF"
         xmlns:local="clr-namespace:Pp"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+        xmlns:viewModels="clr-namespace:Pp.ViewModels"
         x:Class="Pp.MainWindow"
         mc:Ignorable="d"
         Title="EscapePod" 
@@ -15,7 +16,7 @@
         SnapsToDevicePixels="True"
         Background="Black"
         Icon="/Resources/icon.ico"
-        d:DataContext="{d:DesignInstance Type=local:DesignTimeViewModel, IsDesignTimeCreatable=True}">
+        d:DataContext="{d:DesignInstance Type=viewModels:DesignTimeViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions/>
             

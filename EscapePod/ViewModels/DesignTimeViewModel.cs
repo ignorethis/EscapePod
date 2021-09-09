@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Pp.Models;
 
-namespace Pp
+namespace Pp.ViewModels
 {
     public class DesignTimeViewModel : MainWindowViewModel
     {

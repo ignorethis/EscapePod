@@ -9,8 +9,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
+using Pp.Models;
 
-namespace Pp
+namespace Pp.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
