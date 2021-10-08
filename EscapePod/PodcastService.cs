@@ -15,8 +15,16 @@ namespace Pp
 {
     public class PodcastService
     {
-        private string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", "savefile.json");
-        private HttpClient httpClient = new HttpClient();
+        private readonly string contentDirectoryPath;
+        private readonly string savefilePath;
+        private readonly HttpClient httpClient;
+
+        public PodcastService()
+        {
+            contentDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod");
+            savefilePath = Path.Combine(contentDirectoryPath, "savefile.json");
+            httpClient = new HttpClient();
+        }
 
         public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string searchValue)
         {
@@ -175,15 +183,27 @@ namespace Pp
 
         public void SaveToDisk(IEnumerable<Podcast> podcasts)
         {
+            EnsureContentDirectoryExists();
+
             string json = JsonConvert.SerializeObject(podcasts);
-            File.WriteAllText(filePath, json);
+            File.WriteAllText(savefilePath, json);
+        }
+
+        private void EnsureContentDirectoryExists()
+        {
+            if (Directory.Exists(contentDirectoryPath))
+            {
+                return;
+            }
+
+            Directory.CreateDirectory(contentDirectoryPath);
         }
 
         public List<Podcast> LoadFromDisk()
         {
-            if (File.Exists(filePath))
+            if (File.Exists(savefilePath))
             {
-                string fileContent = File.ReadAllText(Path.Combine(filePath));
+                string fileContent = File.ReadAllText(Path.Combine(savefilePath));
                 var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent);
 
                 foreach (var podcast in podcasts)
