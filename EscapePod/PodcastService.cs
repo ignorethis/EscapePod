@@ -216,10 +216,8 @@ namespace EscapePod
 
                 return podcasts;
             }
-            else
-            {
-                return new List<Podcast>();
-            }
+
+            return new List<Podcast>();
         }
 
         public string EpisodeDescriptionParser(string descriptionText)

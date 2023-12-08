@@ -62,10 +62,8 @@ namespace EscapePod.ViewModels
                 {
                     return 0;
                 }
-                else
-                {
-                    return 1;
-                }
+
+                return 1;
             }
         }
 
@@ -77,10 +75,8 @@ namespace EscapePod.ViewModels
                 {
                     return "Pause";
                 }
-                else
-                {
-                    return "Play";
-                }
+
+                return "Play";
             }
         }
 
