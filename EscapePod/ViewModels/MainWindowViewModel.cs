@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using EscapePod.Models;
@@ -118,7 +119,7 @@ namespace EscapePod.ViewModels
             set
             {
                 selectedPodcast = value;
-                this.OnPropertyChanged(nameof(SelectedPodcast));
+                this.OnPropertyChanged();
             }
         }
 
@@ -132,7 +133,7 @@ namespace EscapePod.ViewModels
             set
             {
                 playingEpisode = value;
-                this.OnPropertyChanged(nameof(PlayingEpisode));
+                this.OnPropertyChanged();
             }
         }
 
@@ -149,7 +150,7 @@ namespace EscapePod.ViewModels
             set
             {
                 selectedEpisode.EpisodeLength = value;
-                this.OnPropertyChanged(nameof(EpisodeLength));
+                this.OnPropertyChanged();
             }
         }
 
@@ -163,7 +164,7 @@ namespace EscapePod.ViewModels
             set
             {
                 selectedEpisode = value;
-                this.OnPropertyChanged(nameof(SelectedEpisode));
+                this.OnPropertyChanged();
             }
         }
 
@@ -178,7 +179,7 @@ namespace EscapePod.ViewModels
             {
                 searchString = value;
 
-                this.OnPropertyChanged(nameof(SearchString));
+                this.OnPropertyChanged();
                 this.OnPropertyChanged(nameof(SearchListBoxIndex));
 
                 if (searchString == SearchPlaceholder)
@@ -200,7 +201,7 @@ namespace EscapePod.ViewModels
             set
             {
                 volume = value;
-                this.OnPropertyChanged(nameof(Volume));
+                this.OnPropertyChanged();
 
                 if (audioFileReader != null)
                 {
@@ -505,7 +506,7 @@ namespace EscapePod.ViewModels
             set
             {
                 searchPodcasts = value;
-                this.OnPropertyChanged(nameof(SearchPodcasts));
+                this.OnPropertyChanged();
             }
         }
 
@@ -519,15 +520,15 @@ namespace EscapePod.ViewModels
             set
             {
                 selectedSearchPodcast = value;
-                this.OnPropertyChanged(nameof(SelectedSearchPodcast));
+                this.OnPropertyChanged();
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged(string name)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

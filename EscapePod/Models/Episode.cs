@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
 namespace EscapePod.Models
@@ -60,7 +61,7 @@ namespace EscapePod.Models
             set
             {
                 podcast = value;
-                this.OnPropertyChanged(nameof(Podcast));
+                this.OnPropertyChanged();
             }
         }
 
@@ -98,7 +99,7 @@ namespace EscapePod.Models
             set
             {
                 isDownloading = value;
-                this.OnPropertyChanged(nameof(IsDownloading));
+                this.OnPropertyChanged();
             }
         }
 
@@ -111,7 +112,7 @@ namespace EscapePod.Models
             set
             {
                 isDownloaded = value;
-                this.OnPropertyChanged(nameof(IsDownloaded));
+                this.OnPropertyChanged();
             }
         }
 
@@ -124,7 +125,7 @@ namespace EscapePod.Models
             set
             {
                 timestamp = value;
-                this.OnPropertyChanged(nameof(Timestamp));
+                this.OnPropertyChanged();
             }
         }
 
@@ -137,7 +138,7 @@ namespace EscapePod.Models
             set
             {
                 lastPlayed = value;
-                this.OnPropertyChanged(nameof(LastPlayed));
+                this.OnPropertyChanged();
             }
         }
 
@@ -158,7 +159,7 @@ namespace EscapePod.Models
             set
             {
                 localPath = value;
-                this.OnPropertyChanged(nameof(LocalPath));
+                this.OnPropertyChanged();
             }
         }
 
@@ -171,7 +172,7 @@ namespace EscapePod.Models
             set
             {
                 episodeLength = value;
-                this.OnPropertyChanged(nameof(EpisodeLength));
+                this.OnPropertyChanged();
             }
         }
 
@@ -184,7 +185,7 @@ namespace EscapePod.Models
             set
             {
                 episodeFinished = value;
-                this.OnPropertyChanged(nameof(EpisodeFinished));
+                this.OnPropertyChanged();
             }
         }
 
@@ -244,11 +245,11 @@ namespace EscapePod.Models
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged(string name)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

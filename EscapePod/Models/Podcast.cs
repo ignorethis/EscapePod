@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace EscapePod.Models
 {
@@ -33,7 +34,7 @@ namespace EscapePod.Models
             set
             {
                 name = value;
-                this.OnPropertyChanged(nameof(Name));
+                this.OnPropertyChanged();
             }
         }
 
@@ -47,7 +48,7 @@ namespace EscapePod.Models
             set
             {
                 titleCard = value;
-                this.OnPropertyChanged(nameof(TitleCard));
+                this.OnPropertyChanged();
             }
         }
 
@@ -61,7 +62,7 @@ namespace EscapePod.Models
             set
             {
                 episodeList = value;
-                this.OnPropertyChanged(nameof(EpisodeList));
+                this.OnPropertyChanged();
             }
         }
 
@@ -75,7 +76,7 @@ namespace EscapePod.Models
             set
             {
                 uri = value;
-                this.OnPropertyChanged(nameof(Uri));
+                this.OnPropertyChanged();
             }
         }
 
@@ -89,7 +90,7 @@ namespace EscapePod.Models
             set
             {
                 localTitleCardPath = value;
-                this.OnPropertyChanged(nameof(LocalTitleCardFileFullName));
+                this.OnPropertyChanged();
             }
         }
 
@@ -103,7 +104,7 @@ namespace EscapePod.Models
             set
             {
                 localPodcastPath = value;
-                this.OnPropertyChanged(nameof(LocalPodcastPath));
+                this.OnPropertyChanged();
             }
         }
 
@@ -117,7 +118,7 @@ namespace EscapePod.Models
             set
             {
                 author = value;
-                this.OnPropertyChanged(nameof(Author));
+                this.OnPropertyChanged();
             }
         }
 
@@ -131,7 +132,7 @@ namespace EscapePod.Models
             set
             {
                 subtitle = value;
-                this.OnPropertyChanged(nameof(Subtitle));
+                this.OnPropertyChanged();
             }
         }
 
@@ -145,7 +146,7 @@ namespace EscapePod.Models
             set
             {
                 description = value;
-                this.OnPropertyChanged(nameof(Description));
+                this.OnPropertyChanged();
             }
         }
 
@@ -159,7 +160,7 @@ namespace EscapePod.Models
             set
             {
                 website = value;
-                this.OnPropertyChanged(nameof(Website));
+                this.OnPropertyChanged();
             }
         }
 
@@ -173,7 +174,7 @@ namespace EscapePod.Models
             set
             {
                 isExplicit = value;
-                this.OnPropertyChanged(nameof(IsExplicit));
+                this.OnPropertyChanged();
             }
         }
 
@@ -187,7 +188,7 @@ namespace EscapePod.Models
             set
             {
                 language = value;
-                this.OnPropertyChanged(nameof(Language));
+                this.OnPropertyChanged();
             }
         }
 
@@ -201,7 +202,7 @@ namespace EscapePod.Models
             set
             {
                 copyright = value;
-                this.OnPropertyChanged(nameof(Copyright));
+                this.OnPropertyChanged();
             }
         }
 
@@ -215,7 +216,7 @@ namespace EscapePod.Models
             set
             {
                 episodeCount = value;
-                this.OnPropertyChanged(nameof(EpisodeCount));
+                this.OnPropertyChanged();
             }
         }
 
@@ -229,7 +230,7 @@ namespace EscapePod.Models
             set
             {
                 lastUpdate = value;
-                this.OnPropertyChanged(nameof(LastUpdate));
+                this.OnPropertyChanged();
             }
         }
 
@@ -243,15 +244,15 @@ namespace EscapePod.Models
             set
             {
                 id = value;
-                this.OnPropertyChanged(nameof(Id));
+                this.OnPropertyChanged();
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged(string name)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
