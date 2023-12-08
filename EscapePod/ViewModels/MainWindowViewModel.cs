@@ -337,7 +337,7 @@ namespace EscapePod.ViewModels
             var previousIndex = _selectedPodcast.EpisodeList.IndexOf(_selectedEpisode) + 1;
             if (previousIndex < _selectedPodcast.EpisodeList.Count)
             {
-                _selectedEpisode = _selectedPodcast.EpisodeList.ElementAt(previousIndex);
+                SelectedEpisode = _selectedPodcast.EpisodeList.ElementAt(previousIndex);
             }
         }
 
