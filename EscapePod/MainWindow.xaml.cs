@@ -14,7 +14,7 @@ namespace EscapePod
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = vm;
+            DataContext = vm;
         }
 
         private async void Add_Click(object sender, RoutedEventArgs e)

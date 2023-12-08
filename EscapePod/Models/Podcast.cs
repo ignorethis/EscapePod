@@ -34,7 +34,7 @@ namespace EscapePod.Models
             set
             {
                 _name = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -48,7 +48,7 @@ namespace EscapePod.Models
             set
             {
                 _titleCard = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -62,7 +62,7 @@ namespace EscapePod.Models
             set
             {
                 _episodeList = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -76,7 +76,7 @@ namespace EscapePod.Models
             set
             {
                 _uri = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -90,7 +90,7 @@ namespace EscapePod.Models
             set
             {
                 _localTitleCardPath = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -104,7 +104,7 @@ namespace EscapePod.Models
             set
             {
                 _localPodcastPath = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -118,7 +118,7 @@ namespace EscapePod.Models
             set
             {
                 _author = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -132,7 +132,7 @@ namespace EscapePod.Models
             set
             {
                 _subtitle = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -146,7 +146,7 @@ namespace EscapePod.Models
             set
             {
                 _description = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -160,7 +160,7 @@ namespace EscapePod.Models
             set
             {
                 _website = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -174,7 +174,7 @@ namespace EscapePod.Models
             set
             {
                 _isExplicit = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -188,7 +188,7 @@ namespace EscapePod.Models
             set
             {
                 _language = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -202,7 +202,7 @@ namespace EscapePod.Models
             set
             {
                 _copyright = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -216,7 +216,7 @@ namespace EscapePod.Models
             set
             {
                 _episodeCount = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -230,7 +230,7 @@ namespace EscapePod.Models
             set
             {
                 _lastUpdate = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -244,7 +244,7 @@ namespace EscapePod.Models
             set
             {
                 _id = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 

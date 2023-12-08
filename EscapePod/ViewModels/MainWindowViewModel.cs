@@ -62,7 +62,7 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return this._waveOutDevice.PlaybackState == PlaybackState.Playing;
+                return _waveOutDevice.PlaybackState == PlaybackState.Playing;
             }
         }
 
@@ -119,7 +119,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _selectedPodcast = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -133,7 +133,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _playingEpisode = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -150,7 +150,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _selectedEpisode.EpisodeLength = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -164,7 +164,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _selectedEpisode = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -179,8 +179,8 @@ namespace EscapePod.ViewModels
             {
                 _searchString = value;
 
-                this.OnPropertyChanged();
-                this.OnPropertyChanged(nameof(SearchListBoxIndex));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SearchListBoxIndex));
 
                 if (_searchString == SearchPlaceholder)
                 {
@@ -201,11 +201,11 @@ namespace EscapePod.ViewModels
             set
             {
                 _volume = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
 
                 if (_audioFileReader != null)
                 {
-                    _audioFileReader.Volume = this._volume;
+                    _audioFileReader.Volume = _volume;
                 }
             }
         }
@@ -224,7 +224,7 @@ namespace EscapePod.ViewModels
             var newFeedUri = new Uri(SelectedSearchPodcast.FeedUrl);
             var newPodcast = await _podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
 
-            this.Podcasts.Add(newPodcast);
+            Podcasts.Add(newPodcast);
             _podcastService.SaveToDisk(Podcasts);
             SelectedPodcast = newPodcast;
 
@@ -234,7 +234,7 @@ namespace EscapePod.ViewModels
             await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
             await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
 
-            this.SearchString = string.Empty;
+            SearchString = string.Empty;
         }
 
         public void DeletePodcast()
@@ -281,7 +281,7 @@ namespace EscapePod.ViewModels
 
             PlayingEpisode = SelectedEpisode;
 
-            this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
+            OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
 
         private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -324,7 +324,7 @@ namespace EscapePod.ViewModels
 
             _podcastService.SaveToDisk(Podcasts);
 
-            this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
+            OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
 
         public void NextEpisode()
@@ -348,8 +348,8 @@ namespace EscapePod.ViewModels
         public async Task UpdateAllPodcastAsync()
         {
             //alten zustand merken
-            var oldSelectedPodcastUri = this.SelectedPodcast?.Uri;
-            var oldSelectedEpisodeUri = this.SelectedEpisode?.EpisodeUri;
+            var oldSelectedPodcastUri = SelectedPodcast?.Uri;
+            var oldSelectedEpisodeUri = SelectedEpisode?.EpisodeUri;
 
             //neuen stuff laden
             var updatedPodcasts = new List<Podcast>();
@@ -360,20 +360,20 @@ namespace EscapePod.ViewModels
             }
 
             //das alte zerstoeren
-            this.Podcasts.Clear();
+            Podcasts.Clear();
             foreach (var updatedPodcast in updatedPodcasts)
             {
-                this.Podcasts.Add(updatedPodcast);
+                Podcasts.Add(updatedPodcast);
             }
 
             //alten zustand wiederherstellen
-            this.SelectedPodcast = oldSelectedPodcastUri == null
+            SelectedPodcast = oldSelectedPodcastUri == null
                 ? null
-                : this.Podcasts.FirstOrDefault(p => p.Uri == oldSelectedPodcastUri);
+                : Podcasts.FirstOrDefault(p => p.Uri == oldSelectedPodcastUri);
 
-            this.SelectedEpisode = oldSelectedEpisodeUri == null
+            SelectedEpisode = oldSelectedEpisodeUri == null
                 ? null
-                : this.SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
+                : SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
 
             _podcastService.SaveToDisk(Podcasts);
         }
@@ -485,7 +485,7 @@ namespace EscapePod.ViewModels
 
         public async Task PodcastSearch(string query)
         {
-            var results = await this._podcastService.SearchPodcastAsync(query);
+            var results = await _podcastService.SearchPodcastAsync(query);
             var orderedResults = results.OrderBy(x => x.Name);
 
             SearchPodcasts.Clear();
@@ -506,7 +506,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _searchPodcasts = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -520,7 +520,7 @@ namespace EscapePod.ViewModels
             set
             {
                 _selectedSearchPodcast = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 

@@ -29,26 +29,26 @@ namespace EscapePod.Models
 
         public Episode(Podcast podcast, string episodeName, Uri episodeUri, string description, double timestamp, DateTime? publishDate, TimeSpan duration, string subtitle, string author, bool isExplicit, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
         {
-            this._podcast = podcast;
-            this._episodeName = episodeName;
-            this._episodeUri = episodeUri;
-            this._description = description;
-            this._timestamp = timestamp;
-            this._isDownloading = false;
-            this._isDownloaded = false;
-            this._publishDate = publishDate;
-            this._episodeFinished = false;
-            this._episodeLength = duration.TotalSeconds;
+            _podcast = podcast;
+            _episodeName = episodeName;
+            _episodeUri = episodeUri;
+            _description = description;
+            _timestamp = timestamp;
+            _isDownloading = false;
+            _isDownloaded = false;
+            _publishDate = publishDate;
+            _episodeFinished = false;
+            _episodeLength = duration.TotalSeconds;
 
-            this._subtitle = subtitle;
-            this._author = author;
-            this._isExplicit = isExplicit;
-            this._summary = summary;
-            this._imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
-            this._audioFileSize = audioFileSize;
-            this._audioFileType = audioFileType;
-            this._isDownloaded = isDownloaded;
-            this._localPath = localPath;
+            _subtitle = subtitle;
+            _author = author;
+            _isExplicit = isExplicit;
+            _summary = summary;
+            _imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
+            _audioFileSize = audioFileSize;
+            _audioFileType = audioFileType;
+            _isDownloaded = isDownloaded;
+            _localPath = localPath;
         }
 
         [JsonIgnore]
@@ -61,7 +61,7 @@ namespace EscapePod.Models
             set
             {
                 _podcast = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -99,7 +99,7 @@ namespace EscapePod.Models
             set
             {
                 _isDownloading = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -112,7 +112,7 @@ namespace EscapePod.Models
             set
             {
                 _isDownloaded = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -125,7 +125,7 @@ namespace EscapePod.Models
             set
             {
                 _timestamp = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -138,7 +138,7 @@ namespace EscapePod.Models
             set
             {
                 _lastPlayed = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -159,7 +159,7 @@ namespace EscapePod.Models
             set
             {
                 _localPath = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -172,7 +172,7 @@ namespace EscapePod.Models
             set
             {
                 _episodeLength = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -185,7 +185,7 @@ namespace EscapePod.Models
             set
             {
                 _episodeFinished = value;
-                this.OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 

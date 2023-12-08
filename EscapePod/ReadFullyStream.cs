@@ -13,7 +13,7 @@ namespace EscapePod
 
         public ReadFullyStream(Stream sourceStream)
         {
-            this._sourceStream = sourceStream;
+            _sourceStream = sourceStream;
             _readAheadBuffer = new byte[4096];
         }
         public override bool CanRead
