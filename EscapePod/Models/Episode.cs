@@ -54,10 +54,7 @@ namespace EscapePod.Models
         [JsonIgnore]
         public Podcast Podcast
         {
-            get
-            {
-                return _podcast;
-            }
+            get => _podcast;
             set
             {
                 _podcast = value;
@@ -65,37 +62,16 @@ namespace EscapePod.Models
             }
         }
 
-        public string EpisodeName
-        {
-            get
-            {
-                return _episodeName;
-            }
-        }
+        public string EpisodeName => _episodeName;
 
-        public Uri EpisodeUri
-        {
-            get
-            {
-                return _episodeUri;
-            }
-        }
+        public Uri EpisodeUri => _episodeUri;
 
-        public string Description
-        {
-            get
-            {
-                return _description;
-            }
-        }
+        public string Description => _description;
 
         [JsonIgnore]
         public bool IsDownloading
         {
-            get
-            {
-                return _isDownloading;
-            }
+            get => _isDownloading;
             set
             {
                 _isDownloading = value;
@@ -105,10 +81,7 @@ namespace EscapePod.Models
 
         public bool IsDownloaded
         {
-            get
-            {
-                return _isDownloaded;
-            }
+            get => _isDownloaded;
             set
             {
                 _isDownloaded = value;
@@ -118,10 +91,7 @@ namespace EscapePod.Models
 
         public double Timestamp
         {
-            get
-            {
-                return _timestamp;
-            }
+            get => _timestamp;
             set
             {
                 _timestamp = value;
@@ -131,10 +101,7 @@ namespace EscapePod.Models
 
         public DateTime? LastPlayed
         {
-            get
-            {
-                return _lastPlayed;
-            }
+            get => _lastPlayed;
             set
             {
                 _lastPlayed = value;
@@ -142,20 +109,11 @@ namespace EscapePod.Models
             }
         }
 
-        public DateTime? PublishDate
-        {
-            get
-            {
-                return _publishDate;
-            }
-        }
+        public DateTime? PublishDate => _publishDate;
 
         public string LocalPath
         {
-            get
-            {
-                return _localPath;
-            }
+            get => _localPath;
             set
             {
                 _localPath = value;
@@ -165,10 +123,7 @@ namespace EscapePod.Models
 
         public double EpisodeLength
         {
-            get
-            {
-                return _episodeLength;
-            }
+            get => _episodeLength;
             set
             {
                 _episodeLength = value;
@@ -178,10 +133,7 @@ namespace EscapePod.Models
 
         public bool EpisodeFinished
         {
-            get
-            {
-                return _episodeFinished;
-            }
+            get => _episodeFinished;
             set
             {
                 _episodeFinished = value;
@@ -189,61 +141,19 @@ namespace EscapePod.Models
             }
         }
 
-        public string Subtitle
-        {
-            get
-            {
-                return _subtitle;
-            }
-        }
+        public string Subtitle => _subtitle;
 
-        public string Author
-        {
-            get
-            {
-                return _author;
-            }
-        }
+        public string Author => _author;
 
-        public bool IsExplicit
-        {
-            get
-            {
-                return _isExplicit;
-            }
-        }
+        public bool IsExplicit => _isExplicit;
 
-        public string Summary
-        {
-            get
-            {
-                return _summary;
-            }
-        }
+        public string Summary => _summary;
 
-        public Uri ImageUri
-        {
-            get
-            {
-                return _imageUri;
-            }
-        }
+        public Uri ImageUri => _imageUri;
 
-        public string AudioFileType
-        {
-            get
-            {
-                return _audioFileType;
-            }
-        }
+        public string AudioFileType => _audioFileType;
 
-        public string AudioFileSize
-        {
-            get
-            {
-                return _audioFileSize;
-            }
-        }
+        public string AudioFileSize => _audioFileSize;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

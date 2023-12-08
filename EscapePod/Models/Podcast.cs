@@ -26,11 +26,7 @@ namespace EscapePod.Models
         
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-
+            get => _name;
             set
             {
                 _name = value;
@@ -40,11 +36,7 @@ namespace EscapePod.Models
 
         public Uri TitleCard
         {
-            get
-            {
-                return _titleCard;
-            }
-
+            get => _titleCard;
             set
             {
                 _titleCard = value;
@@ -54,11 +46,7 @@ namespace EscapePod.Models
 
         public List<Episode> EpisodeList
         {
-            get
-            {
-                return _episodeList;
-            }
-
+            get => _episodeList;
             set
             {
                 _episodeList = value;
@@ -68,11 +56,7 @@ namespace EscapePod.Models
 
         public Uri Uri
         {
-            get
-            {
-                return _uri;
-            }
-
+            get => _uri;
             set
             {
                 _uri = value;
@@ -82,11 +66,7 @@ namespace EscapePod.Models
 
         public string LocalTitleCardFileFullName
         {
-            get
-            {
-                return _localTitleCardPath;
-            }
-
+            get => _localTitleCardPath;
             set
             {
                 _localTitleCardPath = value;
@@ -96,11 +76,7 @@ namespace EscapePod.Models
 
         public string LocalPodcastPath
         {
-            get
-            {
-                return _localPodcastPath;
-            }
-
+            get => _localPodcastPath;
             set
             {
                 _localPodcastPath = value;
@@ -110,11 +86,7 @@ namespace EscapePod.Models
 
         public string Author
         {
-            get
-            {
-                return _author;
-            }
-
+            get => _author;
             set
             {
                 _author = value;
@@ -124,11 +96,7 @@ namespace EscapePod.Models
 
         public string Subtitle
         {
-            get
-            {
-                return _subtitle;
-            }
-
+            get => _subtitle;
             set
             {
                 _subtitle = value;
@@ -138,11 +106,7 @@ namespace EscapePod.Models
 
         public string Description
         {
-            get
-            {
-                return _description;
-            }
-
+            get => _description;
             set
             {
                 _description = value;
@@ -152,11 +116,7 @@ namespace EscapePod.Models
 
         public Uri Website
         {
-            get
-            {
-                return _website;
-            }
-
+            get => _website;
             set
             {
                 _website = value;
@@ -166,11 +126,7 @@ namespace EscapePod.Models
 
         public bool IsExplicit
         {
-            get
-            {
-                return _isExplicit;
-            }
-
+            get => _isExplicit;
             set
             {
                 _isExplicit = value;
@@ -180,11 +136,7 @@ namespace EscapePod.Models
 
         public string Language
         {
-            get
-            {
-                return _language;
-            }
-
+            get => _language;
             set
             {
                 _language = value;
@@ -194,11 +146,7 @@ namespace EscapePod.Models
 
         public string Copyright
         {
-            get
-            {
-                return _copyright;
-            }
-
+            get => _copyright;
             set
             {
                 _copyright = value;
@@ -208,11 +156,7 @@ namespace EscapePod.Models
 
         public int EpisodeCount
         {
-            get
-            {
-                return _episodeCount;
-            }
-
+            get => _episodeCount;
             set
             {
                 _episodeCount = value;
@@ -222,11 +166,7 @@ namespace EscapePod.Models
 
         public DateTime? LastUpdate
         {
-            get
-            {
-                return _lastUpdate;
-            }
-
+            get => _lastUpdate;
             set
             {
                 _lastUpdate = value;
@@ -236,11 +176,7 @@ namespace EscapePod.Models
 
         public string Id
         {
-            get
-            {
-                return _id;
-            }
-
+            get => _id;
             set
             {
                 _id = value;

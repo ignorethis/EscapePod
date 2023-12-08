@@ -50,21 +50,9 @@ namespace EscapePod.ViewModels
             Volume = 1.0f;
         }
 
-        public string SearchPlaceholder
-        {
-            get
-            {
-                return "Search for podcasts";
-            }
-        }
+        public string SearchPlaceholder => "Search for podcasts";
 
-        public bool IsPlaying
-        {
-            get
-            {
-                return _waveOutDevice.PlaybackState == PlaybackState.Playing;
-            }
-        }
+        public bool IsPlaying => _waveOutDevice.PlaybackState == PlaybackState.Playing;
 
         public int SearchListBoxIndex
         {
@@ -111,11 +99,7 @@ namespace EscapePod.ViewModels
 
         public Podcast SelectedPodcast
         {
-            get
-            {
-                return _selectedPodcast;
-            }
-
+            get => _selectedPodcast;
             set
             {
                 _selectedPodcast = value;
@@ -125,11 +109,7 @@ namespace EscapePod.ViewModels
 
         public Episode PlayingEpisode
         {
-            get
-            {
-                return _playingEpisode;
-            }
-
+            get => _playingEpisode;
             set
             {
                 _playingEpisode = value;
@@ -156,11 +136,7 @@ namespace EscapePod.ViewModels
 
         public Episode SelectedEpisode
         {
-            get
-            {
-                return _selectedEpisode;
-            }
-
+            get => _selectedEpisode;
             set
             {
                 _selectedEpisode = value;
@@ -170,11 +146,7 @@ namespace EscapePod.ViewModels
 
         public string SearchString
         {
-            get
-            {
-                return _searchString;
-            }
-
+            get => _searchString;
             set
             {
                 _searchString = value;
@@ -193,11 +165,7 @@ namespace EscapePod.ViewModels
 
         public float Volume
         {
-            get
-            {
-                return _volume;
-            }
-
+            get => _volume;
             set
             {
                 _volume = value;
@@ -498,11 +466,7 @@ namespace EscapePod.ViewModels
        
         public ObservableCollection<iTunesPodcastFinder.Models.Podcast> SearchPodcasts
         {
-            get
-            {
-                return _searchPodcasts;
-            }
-
+            get => _searchPodcasts;
             set
             {
                 _searchPodcasts = value;
@@ -512,11 +476,7 @@ namespace EscapePod.ViewModels
 
         public iTunesPodcastFinder.Models.Podcast SelectedSearchPodcast
         {
-            get
-            {
-                return _selectedSearchPodcast;
-            }
-
+            get => _selectedSearchPodcast;
             set
             {
                 _selectedSearchPodcast = value;
