@@ -7,48 +7,48 @@ namespace EscapePod.Models
 {
     public class Episode : INotifyPropertyChanged
     {
-        private string episodeName;
-        private Uri episodeUri;
-        private string localPath;
-        private string description;
-        private bool isDownloading;
-        private bool isDownloaded;
-        private double timestamp;
-        private DateTime? lastPlayed;
-        private DateTime? publishDate;
-        private Podcast podcast;
-        private double episodeLength;
-        private bool episodeFinished;
-        private string subtitle;
-        private string author;
-        private bool isExplicit;
-        private string summary;
-        private Uri imageUri;
-        private string audioFileType;
-        private string audioFileSize;
+        private string _episodeName;
+        private Uri _episodeUri;
+        private string _localPath;
+        private string _description;
+        private bool _isDownloading;
+        private bool _isDownloaded;
+        private double _timestamp;
+        private DateTime? _lastPlayed;
+        private DateTime? _publishDate;
+        private Podcast _podcast;
+        private double _episodeLength;
+        private bool _episodeFinished;
+        private string _subtitle;
+        private string _author;
+        private bool _isExplicit;
+        private string _summary;
+        private Uri _imageUri;
+        private string _audioFileType;
+        private string _audioFileSize;
 
         public Episode(Podcast podcast, string episodeName, Uri episodeUri, string description, double timestamp, DateTime? publishDate, TimeSpan duration, string subtitle, string author, bool isExplicit, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
         {
-            this.podcast = podcast;
-            this.episodeName = episodeName;
-            this.episodeUri = episodeUri;
-            this.description = description;
-            this.timestamp = timestamp;
-            this.isDownloading = false;
-            this.isDownloaded = false;
-            this.publishDate = publishDate;
-            this.episodeFinished = false;
-            this.episodeLength = duration.TotalSeconds;
+            this._podcast = podcast;
+            this._episodeName = episodeName;
+            this._episodeUri = episodeUri;
+            this._description = description;
+            this._timestamp = timestamp;
+            this._isDownloading = false;
+            this._isDownloaded = false;
+            this._publishDate = publishDate;
+            this._episodeFinished = false;
+            this._episodeLength = duration.TotalSeconds;
 
-            this.subtitle = subtitle;
-            this.author = author;
-            this.isExplicit = isExplicit;
-            this.summary = summary;
-            this.imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
-            this.audioFileSize = audioFileSize;
-            this.audioFileType = audioFileType;
-            this.isDownloaded = isDownloaded;
-            this.localPath = localPath;
+            this._subtitle = subtitle;
+            this._author = author;
+            this._isExplicit = isExplicit;
+            this._summary = summary;
+            this._imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
+            this._audioFileSize = audioFileSize;
+            this._audioFileType = audioFileType;
+            this._isDownloaded = isDownloaded;
+            this._localPath = localPath;
         }
 
         [JsonIgnore]
@@ -56,11 +56,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return podcast;
+                return _podcast;
             }
             set
             {
-                podcast = value;
+                _podcast = value;
                 this.OnPropertyChanged();
             }
         }
@@ -69,7 +69,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeName;
+                return _episodeName;
             }
         }
 
@@ -77,7 +77,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeUri;
+                return _episodeUri;
             }
         }
 
@@ -85,7 +85,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return description;
+                return _description;
             }
         }
 
@@ -94,11 +94,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return isDownloading;
+                return _isDownloading;
             }
             set
             {
-                isDownloading = value;
+                _isDownloading = value;
                 this.OnPropertyChanged();
             }
         }
@@ -107,11 +107,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return isDownloaded;
+                return _isDownloaded;
             }
             set
             {
-                isDownloaded = value;
+                _isDownloaded = value;
                 this.OnPropertyChanged();
             }
         }
@@ -120,11 +120,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return timestamp;
+                return _timestamp;
             }
             set
             {
-                timestamp = value;
+                _timestamp = value;
                 this.OnPropertyChanged();
             }
         }
@@ -133,11 +133,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return lastPlayed;
+                return _lastPlayed;
             }
             set
             {
-                lastPlayed = value;
+                _lastPlayed = value;
                 this.OnPropertyChanged();
             }
         }
@@ -146,7 +146,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return publishDate;
+                return _publishDate;
             }
         }
 
@@ -154,11 +154,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return localPath;
+                return _localPath;
             }
             set
             {
-                localPath = value;
+                _localPath = value;
                 this.OnPropertyChanged();
             }
         }
@@ -167,11 +167,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeLength;
+                return _episodeLength;
             }
             set
             {
-                episodeLength = value;
+                _episodeLength = value;
                 this.OnPropertyChanged();
             }
         }
@@ -180,11 +180,11 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeFinished;
+                return _episodeFinished;
             }
             set
             {
-                episodeFinished = value;
+                _episodeFinished = value;
                 this.OnPropertyChanged();
             }
         }
@@ -193,7 +193,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return subtitle;
+                return _subtitle;
             }
         }
 
@@ -201,7 +201,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return author;
+                return _author;
             }
         }
 
@@ -209,7 +209,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return isExplicit;
+                return _isExplicit;
             }
         }
 
@@ -217,7 +217,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return summary;
+                return _summary;
             }
         }
 
@@ -225,7 +225,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return imageUri;
+                return _imageUri;
             }
         }
 
@@ -233,7 +233,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return audioFileType;
+                return _audioFileType;
             }
         }
 
@@ -241,7 +241,7 @@ namespace EscapePod.Models
         {
             get
             {
-                return audioFileSize;
+                return _audioFileSize;
             }
         }
 

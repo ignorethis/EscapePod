@@ -15,15 +15,15 @@ namespace EscapePod
 {
     public class PodcastService
     {
-        private readonly string contentDirectoryPath;
-        private readonly string savefilePath;
-        private readonly HttpClient httpClient;
+        private readonly string _contentDirectoryPath;
+        private readonly string _savefilePath;
+        private readonly HttpClient _httpClient;
 
         public PodcastService()
         {
-            contentDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod");
-            savefilePath = Path.Combine(contentDirectoryPath, "savefile.json");
-            httpClient = new HttpClient();
+            _contentDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod");
+            _savefilePath = Path.Combine(_contentDirectoryPath, "savefile.json");
+            _httpClient = new HttpClient();
         }
 
         public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string searchValue)
@@ -152,7 +152,7 @@ namespace EscapePod
 
         public async Task<string> DownloadFileAsync(Uri uri, string path, string name, string extension)
         {
-            var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+            var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
             var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var fileFullName = GetFileFullName(path, name, extension);
@@ -186,24 +186,24 @@ namespace EscapePod
             EnsureContentDirectoryExists();
 
             string json = JsonConvert.SerializeObject(podcasts);
-            File.WriteAllText(savefilePath, json);
+            File.WriteAllText(_savefilePath, json);
         }
 
         private void EnsureContentDirectoryExists()
         {
-            if (Directory.Exists(contentDirectoryPath))
+            if (Directory.Exists(_contentDirectoryPath))
             {
                 return;
             }
 
-            Directory.CreateDirectory(contentDirectoryPath);
+            Directory.CreateDirectory(_contentDirectoryPath);
         }
 
         public List<Podcast> LoadFromDisk()
         {
-            if (File.Exists(savefilePath))
+            if (File.Exists(_savefilePath))
             {
-                string fileContent = File.ReadAllText(Path.Combine(savefilePath));
+                string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
                 var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent);
 
                 foreach (var podcast in podcasts)

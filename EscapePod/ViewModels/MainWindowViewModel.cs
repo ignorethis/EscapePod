@@ -15,38 +15,38 @@ namespace EscapePod.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private PodcastService podcastService = new PodcastService();
+        private PodcastService _podcastService = new PodcastService();
 
-        protected ObservableCollection<Podcast> podcasts;
-        private Podcast selectedPodcast;
-        private Episode selectedEpisode;
-        private Episode playingEpisode;
+        protected ObservableCollection<Podcast> _podcasts;
+        private Podcast _selectedPodcast;
+        private Episode _selectedEpisode;
+        private Episode _playingEpisode;
 
-        private string searchString;
-        private ObservableCollection<iTunesPodcastFinder.Models.Podcast> searchPodcasts;
-        private iTunesPodcastFinder.Models.Podcast selectedSearchPodcast;
+        private string _searchString;
+        private ObservableCollection<iTunesPodcastFinder.Models.Podcast> _searchPodcasts;
+        private iTunesPodcastFinder.Models.Podcast _selectedSearchPodcast;
 
-        Timer episodeIsPlayingTimer = new Timer(1000);
-        IWavePlayer waveOutDevice = new WaveOutEvent();
-        AudioFileReader audioFileReader;
-        private float volume;
+        Timer _episodeIsPlayingTimer = new Timer(1000);
+        IWavePlayer _waveOutDevice = new WaveOutEvent();
+        AudioFileReader _audioFileReader;
+        private float _volume;
 
         public MainWindowViewModel()
         {
             var myLock = new object();
 
-            podcasts = new ObservableCollection<Podcast>(podcastService.LoadFromDisk());
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(podcasts, myLock);
-            selectedPodcast = SelectedEpisode?.Podcast;
-            selectedEpisode = LastPlayed();
+            _podcasts = new ObservableCollection<Podcast>(_podcastService.LoadFromDisk());
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(_podcasts, myLock);
+            _selectedPodcast = SelectedEpisode?.Podcast;
+            _selectedEpisode = LastPlayed();
 
-            searchString = string.Empty;
+            _searchString = string.Empty;
 
-            searchPodcasts = new ObservableCollection<iTunesPodcastFinder.Models.Podcast>();
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(searchPodcasts, myLock);
-            selectedSearchPodcast = null;
+            _searchPodcasts = new ObservableCollection<iTunesPodcastFinder.Models.Podcast>();
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(_searchPodcasts, myLock);
+            _selectedSearchPodcast = null;
 
-            episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
+            _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
             Volume = 1.0f;
         }
 
@@ -62,7 +62,7 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return this.waveOutDevice.PlaybackState == PlaybackState.Playing;
+                return this._waveOutDevice.PlaybackState == PlaybackState.Playing;
             }
         }
 
@@ -100,12 +100,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                if (podcasts == null)
+                if (_podcasts == null)
                 {
-                    podcasts = new ObservableCollection<Podcast>();
+                    _podcasts = new ObservableCollection<Podcast>();
                 }
 
-                return podcasts;
+                return _podcasts;
             }
         }
 
@@ -113,12 +113,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return selectedPodcast;
+                return _selectedPodcast;
             }
 
             set
             {
-                selectedPodcast = value;
+                _selectedPodcast = value;
                 this.OnPropertyChanged();
             }
         }
@@ -127,12 +127,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return playingEpisode;
+                return _playingEpisode;
             }
 
             set
             {
-                playingEpisode = value;
+                _playingEpisode = value;
                 this.OnPropertyChanged();
             }
         }
@@ -141,15 +141,15 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                if (selectedEpisode == null || selectedEpisode.EpisodeLength == 0)
+                if (_selectedEpisode == null || _selectedEpisode.EpisodeLength == 0)
                 {
                     return 1;
                 }
-                return selectedEpisode.EpisodeLength;
+                return _selectedEpisode.EpisodeLength;
             }
             set
             {
-                selectedEpisode.EpisodeLength = value;
+                _selectedEpisode.EpisodeLength = value;
                 this.OnPropertyChanged();
             }
         }
@@ -158,12 +158,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return selectedEpisode;
+                return _selectedEpisode;
             }
 
             set
             {
-                selectedEpisode = value;
+                _selectedEpisode = value;
                 this.OnPropertyChanged();
             }
         }
@@ -172,22 +172,22 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return searchString;
+                return _searchString;
             }
 
             set
             {
-                searchString = value;
+                _searchString = value;
 
                 this.OnPropertyChanged();
                 this.OnPropertyChanged(nameof(SearchListBoxIndex));
 
-                if (searchString == SearchPlaceholder)
+                if (_searchString == SearchPlaceholder)
                 {
                     return;
                 }
 
-                PodcastSearch(searchString).ConfigureAwait(true);
+                PodcastSearch(_searchString).ConfigureAwait(true);
             }
         }
 
@@ -195,17 +195,17 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return volume;
+                return _volume;
             }
 
             set
             {
-                volume = value;
+                _volume = value;
                 this.OnPropertyChanged();
 
-                if (audioFileReader != null)
+                if (_audioFileReader != null)
                 {
-                    audioFileReader.Volume = this.volume;
+                    _audioFileReader.Volume = this._volume;
                 }
             }
         }
@@ -222,17 +222,17 @@ namespace EscapePod.ViewModels
             }
 
             var newFeedUri = new Uri(SelectedSearchPodcast.FeedUrl);
-            var newPodcast = await podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
+            var newPodcast = await _podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
 
             this.Podcasts.Add(newPodcast);
-            podcastService.SaveToDisk(Podcasts);
+            _podcastService.SaveToDisk(Podcasts);
             SelectedPodcast = newPodcast;
 
             //TODO hier noch bug fixen, dass bild erst gesetzt wird bevor es runtergeladen ist ... und dann crap binding exception kommt :C
-            await podcastService.DownloadTitleCardAsync(newPodcast);
+            await _podcastService.DownloadTitleCardAsync(newPodcast);
 
-            await podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
-            await podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
+            await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
+            await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
 
             this.SearchString = string.Empty;
         }
@@ -240,7 +240,7 @@ namespace EscapePod.ViewModels
         public void DeletePodcast()
         {
             Podcasts.Remove(SelectedPodcast);
-            podcastService.SaveToDisk(Podcasts);
+            _podcastService.SaveToDisk(Podcasts);
         }
 
         public async Task PlayOrPauseAsync()
@@ -258,26 +258,26 @@ namespace EscapePod.ViewModels
         public async Task PlayEpisodeAsync()
         {
             if (PlayingEpisode == SelectedEpisode 
-                && waveOutDevice.PlaybackState == PlaybackState.Playing)
+                && _waveOutDevice.PlaybackState == PlaybackState.Playing)
             {
                 return;
             }
 
-            await podcastService.DownloadEpisodeAsync(SelectedEpisode);
+            await _podcastService.DownloadEpisodeAsync(SelectedEpisode);
 
-            if (waveOutDevice.PlaybackState == PlaybackState.Playing 
-                || waveOutDevice.PlaybackState == PlaybackState.Paused)
+            if (_waveOutDevice.PlaybackState == PlaybackState.Playing
+                || _waveOutDevice.PlaybackState == PlaybackState.Paused)
             {
-                waveOutDevice.Stop();
+                _waveOutDevice.Stop();
             }
 
-            audioFileReader = new AudioFileReader(selectedEpisode.LocalPath);
-            waveOutDevice.Init(audioFileReader);
-            audioFileReader.CurrentTime = TimeSpan.FromSeconds(SelectedEpisode.Timestamp);
-            EpisodeLength = audioFileReader.TotalTime.TotalSeconds;
-            audioFileReader.Volume = Volume;
-            waveOutDevice.Play();
-            episodeIsPlayingTimer.Start();
+            _audioFileReader = new AudioFileReader(_selectedEpisode.LocalPath);
+            _waveOutDevice.Init(_audioFileReader);
+            _audioFileReader.CurrentTime = TimeSpan.FromSeconds(SelectedEpisode.Timestamp);
+            EpisodeLength = _audioFileReader.TotalTime.TotalSeconds;
+            _audioFileReader.Volume = Volume;
+            _waveOutDevice.Play();
+            _episodeIsPlayingTimer.Start();
 
             PlayingEpisode = SelectedEpisode;
 
@@ -291,9 +291,9 @@ namespace EscapePod.ViewModels
                 return;
             }
 
-            PlayingEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
+            PlayingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
 
-            if (audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
+            if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
             {
                 var nextIndex = SelectedPodcast.EpisodeList.IndexOf(PlayingEpisode) - 1;
 
@@ -303,13 +303,13 @@ namespace EscapePod.ViewModels
 
                     if (!nextEpisode.IsDownloading)
                     {
-                        await podcastService.DownloadEpisodeAsync(nextEpisode);
+                        await _podcastService.DownloadEpisodeAsync(nextEpisode);
                         nextEpisode.IsDownloading = false;
                         nextEpisode.IsDownloaded = true;
                     }
                 }
             }
-            if (audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.95))
+            if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.95))
             {
                 SelectedEpisode.EpisodeFinished = true;
             }
@@ -317,12 +317,12 @@ namespace EscapePod.ViewModels
 
         private void PauseEpisode()
         {
-            episodeIsPlayingTimer.Stop();
-            waveOutDevice.Pause();
-            PlayingEpisode.Timestamp = audioFileReader.CurrentTime.TotalSeconds;
+            _episodeIsPlayingTimer.Stop();
+            _waveOutDevice.Pause();
+            PlayingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
             PlayingEpisode.LastPlayed = DateTime.Now;
 
-            podcastService.SaveToDisk(Podcasts);
+            _podcastService.SaveToDisk(Podcasts);
 
             this.OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         }
@@ -355,7 +355,7 @@ namespace EscapePod.ViewModels
             var updatedPodcasts = new List<Podcast>();
             for (int i = 0; i < Podcasts.Count; i++)
             {
-                var updatedPodcast = await podcastService.GetPodcastAsync(Podcasts[i].Uri);
+                var updatedPodcast = await _podcastService.GetPodcastAsync(Podcasts[i].Uri);
                 updatedPodcasts.Add(updatedPodcast);
             }
 
@@ -375,7 +375,7 @@ namespace EscapePod.ViewModels
                 ? null
                 : this.SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
 
-            podcastService.SaveToDisk(Podcasts);
+            _podcastService.SaveToDisk(Podcasts);
         }
 
         public void SelectFirstEpisode()
@@ -405,13 +405,13 @@ namespace EscapePod.ViewModels
                 return;
             }
 
-            if (audioFileReader == null)
+            if (_audioFileReader == null)
             {
                 return;
             }
 
             SelectedEpisode.Timestamp = timestamp;
-            audioFileReader.CurrentTime = TimeSpan.FromSeconds(timestamp);
+            _audioFileReader.CurrentTime = TimeSpan.FromSeconds(timestamp);
         }
 
         public async Task StreamEpisodeAsync(Episode current)
@@ -463,7 +463,7 @@ namespace EscapePod.ViewModels
         public Episode LastPlayed()
         {
             Episode hi = null;
-            foreach (Podcast p in podcasts)
+            foreach (Podcast p in _podcasts)
             {
                 foreach (Episode e in p.EpisodeList)
                 {
@@ -485,7 +485,7 @@ namespace EscapePod.ViewModels
 
         public async Task PodcastSearch(string query)
         {
-            var results = await this.podcastService.SearchPodcastAsync(query);
+            var results = await this._podcastService.SearchPodcastAsync(query);
             var orderedResults = results.OrderBy(x => x.Name);
 
             SearchPodcasts.Clear();
@@ -500,12 +500,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return searchPodcasts;
+                return _searchPodcasts;
             }
 
             set
             {
-                searchPodcasts = value;
+                _searchPodcasts = value;
                 this.OnPropertyChanged();
             }
         }
@@ -514,12 +514,12 @@ namespace EscapePod.ViewModels
         {
             get
             {
-                return selectedSearchPodcast;
+                return _selectedSearchPodcast;
             }
 
             set
             {
-                selectedSearchPodcast = value;
+                _selectedSearchPodcast = value;
                 this.OnPropertyChanged();
             }
         }

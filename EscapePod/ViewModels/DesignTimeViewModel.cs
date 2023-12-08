@@ -20,7 +20,7 @@ namespace EscapePod.ViewModels
 
             testPodcast.EpisodeList = new List<Episode>() { episode1, episode2, episode3 };
 
-            podcasts = new ObservableCollection<Podcast>() { testPodcast };
+            _podcasts = new ObservableCollection<Podcast>() { testPodcast };
 
             SelectedPodcast = testPodcast;
             SelectedEpisode = episode1;

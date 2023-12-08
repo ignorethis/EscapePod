@@ -7,33 +7,33 @@ namespace EscapePod.Models
 {
     public class Podcast : INotifyPropertyChanged
     {
-        private Uri uri;
-        private string name;
-        private Uri titleCard;
-        private string localTitleCardPath;
-        private string localPodcastPath;
-        private string author;
-        private string subtitle;
-        private string description;
-        private Uri website;
-        private bool isExplicit;
-        private string language;
-        private string copyright;
-        private int episodeCount;
-        private DateTime? lastUpdate;
-        private string id;
-        private List<Episode> episodeList = new List<Episode>();
+        private Uri _uri;
+        private string _name;
+        private Uri _titleCard;
+        private string _localTitleCardPath;
+        private string _localPodcastPath;
+        private string _author;
+        private string _subtitle;
+        private string _description;
+        private Uri _website;
+        private bool _isExplicit;
+        private string _language;
+        private string _copyright;
+        private int _episodeCount;
+        private DateTime? _lastUpdate;
+        private string _id;
+        private List<Episode> _episodeList = new List<Episode>();
         
         public string Name
         {
             get
             {
-                return name;
+                return _name;
             }
 
             set
             {
-                name = value;
+                _name = value;
                 this.OnPropertyChanged();
             }
         }
@@ -42,12 +42,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return titleCard;
+                return _titleCard;
             }
 
             set
             {
-                titleCard = value;
+                _titleCard = value;
                 this.OnPropertyChanged();
             }
         }
@@ -56,12 +56,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeList;
+                return _episodeList;
             }
 
             set
             {
-                episodeList = value;
+                _episodeList = value;
                 this.OnPropertyChanged();
             }
         }
@@ -70,12 +70,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return uri;
+                return _uri;
             }
 
             set
             {
-                uri = value;
+                _uri = value;
                 this.OnPropertyChanged();
             }
         }
@@ -84,12 +84,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return localTitleCardPath;
+                return _localTitleCardPath;
             }
 
             set
             {
-                localTitleCardPath = value;
+                _localTitleCardPath = value;
                 this.OnPropertyChanged();
             }
         }
@@ -98,12 +98,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return localPodcastPath;
+                return _localPodcastPath;
             }
 
             set
             {
-                localPodcastPath = value;
+                _localPodcastPath = value;
                 this.OnPropertyChanged();
             }
         }
@@ -112,12 +112,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return author;
+                return _author;
             }
 
             set
             {
-                author = value;
+                _author = value;
                 this.OnPropertyChanged();
             }
         }
@@ -126,12 +126,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return subtitle;
+                return _subtitle;
             }
 
             set
             {
-                subtitle = value;
+                _subtitle = value;
                 this.OnPropertyChanged();
             }
         }
@@ -140,12 +140,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return description;
+                return _description;
             }
 
             set
             {
-                description = value;
+                _description = value;
                 this.OnPropertyChanged();
             }
         }
@@ -154,12 +154,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return website;
+                return _website;
             }
 
             set
             {
-                website = value;
+                _website = value;
                 this.OnPropertyChanged();
             }
         }
@@ -168,12 +168,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return isExplicit;
+                return _isExplicit;
             }
 
             set
             {
-                isExplicit = value;
+                _isExplicit = value;
                 this.OnPropertyChanged();
             }
         }
@@ -182,12 +182,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return language;
+                return _language;
             }
 
             set
             {
-                language = value;
+                _language = value;
                 this.OnPropertyChanged();
             }
         }
@@ -196,12 +196,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return copyright;
+                return _copyright;
             }
 
             set
             {
-                copyright = value;
+                _copyright = value;
                 this.OnPropertyChanged();
             }
         }
@@ -210,12 +210,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return episodeCount;
+                return _episodeCount;
             }
 
             set
             {
-                episodeCount = value;
+                _episodeCount = value;
                 this.OnPropertyChanged();
             }
         }
@@ -224,12 +224,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return lastUpdate;
+                return _lastUpdate;
             }
 
             set
             {
-                lastUpdate = value;
+                _lastUpdate = value;
                 this.OnPropertyChanged();
             }
         }
@@ -238,12 +238,12 @@ namespace EscapePod.Models
         {
             get
             {
-                return id;
+                return _id;
             }
 
             set
             {
-                id = value;
+                _id = value;
                 this.OnPropertyChanged();
             }
         }
