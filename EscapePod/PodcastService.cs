@@ -1,7 +1,4 @@
-﻿using HtmlAgilityPack;
-using iTunesPodcastFinder;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,9 +6,12 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Pp.Models;
+using EscapePod.Models;
+using HtmlAgilityPack;
+using iTunesPodcastFinder;
+using Newtonsoft.Json;
 
-namespace Pp
+namespace EscapePod
 {
     public class PodcastService
     {

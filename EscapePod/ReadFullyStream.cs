@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Pp
+namespace EscapePod
 {
     public class ReadFullyStream : Stream
     {

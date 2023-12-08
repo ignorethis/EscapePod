@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Pp.Models
+namespace EscapePod.Models
 {
     public class Podcast : INotifyPropertyChanged
     {

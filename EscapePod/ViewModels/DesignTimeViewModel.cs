@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Pp.Models;
+using EscapePod.Models;
 
-namespace Pp.ViewModels
+namespace EscapePod.ViewModels
 {
     public class DesignTimeViewModel : MainWindowViewModel
     {

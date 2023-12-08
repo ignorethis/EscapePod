@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Pp
+namespace EscapePod
 {
     /// <summary>
     /// Interaction logic for App.xaml

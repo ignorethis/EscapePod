@@ -1,4 +1,4 @@
-﻿namespace Pp.Models
+﻿namespace EscapePod.Models
 {
     public class Link
     {

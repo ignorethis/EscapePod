@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
-namespace Pp.Models
+namespace EscapePod.Models
 {
     public class Episode : INotifyPropertyChanged
     {

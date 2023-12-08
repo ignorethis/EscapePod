@@ -1,5 +1,4 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,9 +7,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
-using Pp.Models;
+using EscapePod.Models;
+using NAudio.Wave;
 
-namespace Pp.ViewModels
+namespace EscapePod.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {

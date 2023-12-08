@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using Pp.ViewModels;
+using EscapePod.ViewModels;
 
-namespace Pp
+namespace EscapePod
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

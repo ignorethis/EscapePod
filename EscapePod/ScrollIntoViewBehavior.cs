@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace Pp
+namespace EscapePod
 {
     public static class ScrollCurrentItemIntoViewBehavior
     {
