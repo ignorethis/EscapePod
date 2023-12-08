@@ -18,9 +18,9 @@ namespace EscapePod.ViewModels
         private PodcastService _podcastService = new PodcastService();
 
         protected ObservableCollection<Podcast> _podcasts;
-        private Podcast _selectedPodcast;
-        private Episode _selectedEpisode;
-        private Episode _playingEpisode;
+        private Podcast? _selectedPodcast;
+        private Episode? _selectedEpisode;
+        private Episode? _playingEpisode;
 
         private string _searchString;
         private ObservableCollection<iTunesPodcastFinder.Models.Podcast> _searchPodcasts;
@@ -93,7 +93,7 @@ namespace EscapePod.ViewModels
             }
         }
 
-        public Podcast SelectedPodcast
+        public Podcast? SelectedPodcast
         {
             get => _selectedPodcast;
             set
@@ -103,7 +103,7 @@ namespace EscapePod.ViewModels
             }
         }
 
-        public Episode PlayingEpisode
+        public Episode? PlayingEpisode
         {
             get => _playingEpisode;
             set
@@ -130,7 +130,7 @@ namespace EscapePod.ViewModels
             }
         }
 
-        public Episode SelectedEpisode
+        public Episode? SelectedEpisode
         {
             get => _selectedEpisode;
             set
@@ -203,7 +203,12 @@ namespace EscapePod.ViewModels
 
         public void DeletePodcast()
         {
-            Podcasts.Remove(SelectedPodcast);
+            if (_selectedPodcast == null)
+            {
+                return;
+            }
+
+            Podcasts.Remove(_selectedPodcast);
             _podcastService.SaveToDisk(Podcasts);
         }
 
@@ -250,20 +255,20 @@ namespace EscapePod.ViewModels
 
         private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (PlayingEpisode == null)
+            if (_playingEpisode == null || _selectedPodcast == null || _selectedEpisode == null)
             {
                 return;
             }
 
-            PlayingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
+            _playingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
 
             if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
             {
-                var nextIndex = SelectedPodcast.EpisodeList.IndexOf(PlayingEpisode) - 1;
+                var nextIndex = _selectedPodcast.EpisodeList.IndexOf(_selectedEpisode) - 1;
 
                 if (nextIndex >= 0)
                 {
-                    var nextEpisode = SelectedPodcast.EpisodeList.ElementAt(nextIndex);
+                    var nextEpisode = _selectedPodcast.EpisodeList.ElementAt(nextIndex);
 
                     if (!nextEpisode.IsDownloading)
                     {
@@ -275,16 +280,21 @@ namespace EscapePod.ViewModels
             }
             if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.95))
             {
-                SelectedEpisode.EpisodeFinished = true;
+                _selectedEpisode.EpisodeFinished = true;
             }
         }
 
         private void PauseEpisode()
         {
+            if (_playingEpisode == null)
+            {
+                return;
+            }
+
             _episodeIsPlayingTimer.Stop();
             _waveOutDevice.Pause();
-            PlayingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
-            PlayingEpisode.LastPlayed = DateTime.Now;
+            _playingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
+            _playingEpisode.LastPlayed = DateTime.Now;
 
             _podcastService.SaveToDisk(Podcasts);
 
@@ -293,19 +303,41 @@ namespace EscapePod.ViewModels
 
         public void NextEpisode()
         {
-            var nextIndex = SelectedPodcast.EpisodeList.IndexOf(SelectedEpisode) - 1;
+            if (_selectedPodcast == null)
+            {
+                return;
+            }
+
+            if (_selectedEpisode == null)
+            {
+                SelectedEpisode = _selectedPodcast.EpisodeList.FirstOrDefault();
+                return;
+            }
+
+            var nextIndex = _selectedPodcast.EpisodeList.IndexOf(_selectedEpisode) - 1;
             if (nextIndex >= 0)
             {
-                SelectedEpisode = SelectedPodcast.EpisodeList.ElementAt(nextIndex);
+                SelectedEpisode = _selectedPodcast.EpisodeList.ElementAt(nextIndex);
             }
         }
 
         public void PreviousEpisode()
         {
-            var previousIndex = SelectedPodcast.EpisodeList.IndexOf(SelectedEpisode) + 1;
-            if (previousIndex < SelectedPodcast.EpisodeList.Count)
+            if (_selectedPodcast == null)
             {
-                SelectedEpisode = SelectedPodcast.EpisodeList.ElementAt(previousIndex);
+                return;
+            }
+
+            if (_selectedEpisode == null)
+            {
+                SelectedEpisode = _selectedPodcast.EpisodeList.LastOrDefault();
+                return;
+            }
+
+            var previousIndex = _selectedPodcast.EpisodeList.IndexOf(_selectedEpisode) + 1;
+            if (previousIndex < _selectedPodcast.EpisodeList.Count)
+            {
+                _selectedEpisode = _selectedPodcast.EpisodeList.ElementAt(previousIndex);
             }
         }
 
@@ -335,31 +367,34 @@ namespace EscapePod.ViewModels
                 ? null
                 : Podcasts.FirstOrDefault(p => p.Uri == oldSelectedPodcastUri);
 
-            SelectedEpisode = oldSelectedEpisodeUri == null
-                ? null
-                : SelectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
+            if (_selectedPodcast != null)
+            {
+                SelectedEpisode = oldSelectedEpisodeUri == null
+                    ? null
+                    : _selectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
+            }
 
             _podcastService.SaveToDisk(Podcasts);
         }
 
         public void SelectFirstEpisode()
         {
-            if (SelectedPodcast == null)
+            if (_selectedPodcast == null)
             {
                 return;
             }
 
-            SelectedEpisode = SelectedPodcast.EpisodeList.Last();
+            SelectedEpisode = _selectedPodcast.EpisodeList.LastOrDefault();
         }
 
         public void SelectLastEpisode()
         {
-            if (SelectedPodcast == null)
+            if (_selectedPodcast == null)
             {
                 return;
             }
 
-            SelectedEpisode = SelectedPodcast.EpisodeList.First();
+            SelectedEpisode = _selectedPodcast.EpisodeList.FirstOrDefault();
         }
 
         public void Seek(double timestamp)
