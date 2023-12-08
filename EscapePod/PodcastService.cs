@@ -297,7 +297,7 @@ namespace EscapePod
                 Subtitle = descriptionValue,
                 Description = outerPodcast.Summary,
                 Website = validWebsite ? websiteUri : null,
-                IsExplicid = explicitValue != null && explicitValue == "yes" ? true : false,
+                IsExplicit = explicitValue != null && explicitValue == "yes" ? true : false,
                 Language = languageValue,
                 Copyright = copyrightValue,
                 EpisodeCount = outerPodcast.EpisodesCount,

@@ -15,7 +15,7 @@ namespace EscapePod.Models
         private string subtitle;
         private string description;
         private Uri website;
-        private bool isExplicid;
+        private bool isExplicit;
         private string language;
         private string copyright;
         private int episodeCount;
@@ -163,17 +163,17 @@ namespace EscapePod.Models
             }
         }
 
-        public bool IsExplicid
+        public bool IsExplicit
         {
             get
             {
-                return isExplicid;
+                return isExplicit;
             }
 
             set
             {
-                isExplicid = value;
-                this.OnPropertyChanged(nameof(IsExplicid));
+                isExplicit = value;
+                this.OnPropertyChanged(nameof(IsExplicit));
             }
         }
 

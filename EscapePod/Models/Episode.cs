@@ -20,13 +20,13 @@ namespace EscapePod.Models
         private bool episodeFinished;
         private string subtitle;
         private string author;
-        private bool isExplicid;
+        private bool isExplicit;
         private string summary;
         private Uri imageUri;
         private string audioFileType;
         private string audioFileSize;
 
-        public Episode(Podcast podcast, string episodeName, Uri episodeUri, string description, double timestamp, DateTime? publishDate, TimeSpan duration, string subtitle, string author, bool isExplicid, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
+        public Episode(Podcast podcast, string episodeName, Uri episodeUri, string description, double timestamp, DateTime? publishDate, TimeSpan duration, string subtitle, string author, bool isExplicit, string summary, string imageUri, string audioFileSize, string audioFileType, bool isDownloaded, string localPath)
         {
             this.podcast = podcast;
             this.episodeName = episodeName;
@@ -41,7 +41,7 @@ namespace EscapePod.Models
 
             this.subtitle = subtitle;
             this.author = author;
-            this.isExplicid = isExplicid;
+            this.isExplicit = isExplicit;
             this.summary = summary;
             this.imageUri = string.IsNullOrEmpty(imageUri) ? podcast.TitleCard : new Uri(imageUri);
             this.audioFileSize = audioFileSize;
@@ -204,11 +204,11 @@ namespace EscapePod.Models
             }
         }
 
-        public bool IsExplicid
+        public bool IsExplicit
         {
             get
             {
-                return isExplicid;
+                return isExplicit;
             }
         }
 
