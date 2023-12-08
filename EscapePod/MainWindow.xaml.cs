@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 using EscapePod.ViewModels;
 
@@ -15,6 +16,7 @@ namespace EscapePod
         {
             InitializeComponent();
             DataContext = vm;
+            Closing += OnClosing;
         }
 
         private async void Add_Click(object sender, RoutedEventArgs e)
@@ -71,6 +73,11 @@ namespace EscapePod
             var newValue = ratio * progressBar.Maximum;
 
             vm.Seek(newValue);
+        }
+
+        private void OnClosing(object? sender, CancelEventArgs e)
+        {
+            vm.CloseApplication();
         }
     }
 }

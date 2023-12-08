@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Data;
 using EscapePod.Models;
 using NAudio.Wave;
 
@@ -36,14 +37,15 @@ namespace EscapePod.ViewModels
             var myLock = new object();
 
             _podcasts = new ObservableCollection<Podcast>(_podcastService.LoadFromDisk());
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(_podcasts, myLock);
-            _selectedPodcast = SelectedEpisode?.Podcast;
-            _selectedEpisode = LastPlayed();
+            BindingOperations.EnableCollectionSynchronization(_podcasts, myLock);
+            (Podcast? lastPlayedPodcast, Episode? lastPlayedEpisode) = GetLastPlayedPodcastAndEpisode(_podcasts);
+            SelectedPodcast = lastPlayedPodcast;
+            SelectedEpisode = lastPlayedEpisode;
+            _playingEpisode = null;
 
             _searchString = string.Empty;
-
             _searchPodcasts = new ObservableCollection<iTunesPodcastFinder.Models.Podcast>();
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(_searchPodcasts, myLock);
+            BindingOperations.EnableCollectionSynchronization(_searchPodcasts, myLock);
             _selectedSearchPodcast = null;
 
             _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
@@ -261,6 +263,7 @@ namespace EscapePod.ViewModels
             }
 
             _playingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
+            _playingEpisode.LastPlayed = e.SignalTime;
 
             if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.8))
             {
@@ -459,27 +462,29 @@ namespace EscapePod.ViewModels
             return new AcmMp3FrameDecompressor(waveFormat);
         }
 
-        public Episode LastPlayed()
+        public (Podcast? lastPlayedPodcast, Episode? lastPlayedEpisode) GetLastPlayedPodcastAndEpisode(IEnumerable<Podcast> podcasts)
         {
-            Episode hi = null;
+            Podcast? lastPlayedPodcast = _podcasts.FirstOrDefault();
+            Episode? lastPlayedEpisode = lastPlayedPodcast?.EpisodeList.FirstOrDefault();
+
             foreach (Podcast p in _podcasts)
             {
                 foreach (Episode e in p.EpisodeList)
                 {
-                    if (e.LastPlayed != null)
+                    if (e.LastPlayed == null)
                     {
-                        if (hi == null)
-                        {
-                            hi = e;
-                        }
-                        else if (e.LastPlayed > hi.LastPlayed)
-                        {
-                            hi = e;
-                        }
+                        continue;
+                    }
+
+                    if (e.LastPlayed.GetValueOrDefault() > lastPlayedEpisode?.LastPlayed.GetValueOrDefault())
+                    {
+                        lastPlayedPodcast = p;
+                        lastPlayedEpisode = e;
                     }
                 }
             }
-            return hi;
+
+            return (lastPlayedPodcast, lastPlayedEpisode);
         }
 
         public async Task PodcastSearch(string query)
@@ -513,6 +518,11 @@ namespace EscapePod.ViewModels
                 _selectedSearchPodcast = value;
                 OnPropertyChanged();
             }
+        }
+
+        public void CloseApplication()
+        {
+            _podcastService.SaveToDisk(_podcasts);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
