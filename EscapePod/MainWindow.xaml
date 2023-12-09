@@ -55,20 +55,20 @@
             <Button Content="First" Click="First_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="3">
-            <escapePod:TextBoxWithPlaceholder
-                Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}"
-                Background="Black"
-                Foreground="White"
-                Height="25"
-                Placeholder="{Binding SearchPlaceholder}"
-                VerticalContentAlignment="Center" />
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Content="Add" Height="25" Click="Add_Click" Background="Black" Foreground="White" />
-                <Button Content="Delete" Height="25" Click="Delete_Click" Background="Black" Foreground="White" Grid.Column="2" />
+                <escapePod:TextBoxWithPlaceholder
+                    Grid.Column="0"
+                    Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}"
+                    Background="Black"
+                    Foreground="White"
+                    Height="25"
+                    Placeholder="{Binding SearchPlaceholder}"
+                    VerticalContentAlignment="Center" />
+                <Button Grid.Column="1" Content="Add" Height="25" Click="Add_Click" Background="Black" Foreground="White" Padding="5, 0" />
             </Grid>
             <Slider Maximum="1.0" Background="Black" TickPlacement="BottomRight" TickFrequency="0.10" Value="{Binding Volume}" />
         </StackPanel>
@@ -81,7 +81,14 @@
             <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Name}"/>
+                            <Button Grid.Column="1" Content="-" Tag="{Binding}" Width="16" Height="16" Background="Black" Foreground="White" Click="Delete_Click" />
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

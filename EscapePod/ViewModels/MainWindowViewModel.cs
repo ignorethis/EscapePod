@@ -203,14 +203,14 @@ namespace EscapePod.ViewModels
             SearchString = string.Empty;
         }
 
-        public void DeletePodcast()
+        public void DeletePodcast(Podcast? podcast)
         {
-            if (_selectedPodcast == null)
+            if (podcast == null)
             {
                 return;
             }
 
-            Podcasts.Remove(_selectedPodcast);
+            Podcasts.Remove(podcast);
             _podcastService.SaveToDisk(Podcasts);
         }
 

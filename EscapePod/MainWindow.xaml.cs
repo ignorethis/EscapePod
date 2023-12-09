@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using EscapePod.Models;
 using EscapePod.ViewModels;
 
 namespace EscapePod
@@ -29,7 +31,8 @@ namespace EscapePod
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            vm.DeletePodcast();
+            var podcast = (Podcast)((Button)sender).Tag;
+            vm.DeletePodcast(podcast);
         }
 
         private async void PlayOrPause_Click(object sender, RoutedEventArgs e)
