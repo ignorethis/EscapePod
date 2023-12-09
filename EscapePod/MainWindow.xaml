@@ -78,7 +78,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ListBox Grid.ColumnSpan="2" Panel.ZIndex="{Binding SearchListBoxIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SearchPodcasts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" SelectedItem="{Binding SelectedSearchPodcast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" DisplayMemberPath="Name" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch"/>
-            <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch">
+            <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -86,13 +86,22 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                             <Button Grid.Column="1" Content="-" Tag="{Binding}" Width="16" Height="16" Background="Black" Foreground="White" Click="Delete_Click" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox Grid.Column="1" ItemsSource="{Binding SelectedPodcast.EpisodeList}" SelectedItem="{Binding SelectedEpisode}" MouseDoubleClick="EpisodeList_DoubleClick" Background="Black" Foreground="White" escapePod:ScrollCurrentItemIntoViewBehavior.AutoScrollToCurrentItem="True" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+            <ListBox Grid.Column="1"
+                ItemsSource="{Binding SelectedPodcast.EpisodeList}"
+                SelectedItem="{Binding SelectedEpisode}"
+                MouseDoubleClick="EpisodeList_DoubleClick"
+                Background="Black"
+                Foreground="White"
+                escapePod:ScrollCurrentItemIntoViewBehavior.AutoScrollToCurrentItem="True"
+                HorizontalContentAlignment="Stretch"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -100,7 +109,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding EpisodeName}">
+                            <TextBlock Text="{Binding EpisodeName}" TextTrimming="CharacterEllipsis">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
