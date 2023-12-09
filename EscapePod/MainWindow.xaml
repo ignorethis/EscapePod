@@ -55,7 +55,13 @@
             <Button Content="First" Click="First_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="3">
-            <escapePod:TextBoxWithPlaceholder Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" Placeholder="{Binding SearchPlaceholder}" Background="Black" Foreground="White" />
+            <escapePod:TextBoxWithPlaceholder
+                Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}"
+                Background="Black"
+                Foreground="White"
+                Height="25"
+                Placeholder="{Binding SearchPlaceholder}"
+                VerticalContentAlignment="Center" />
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
