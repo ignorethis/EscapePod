@@ -271,7 +271,7 @@ namespace EscapePod
         private Podcast GetPodcastFrom(iTunesPodcastFinder.Models.Podcast outerPodcast)
         {
             var invalidChars = Path.GetInvalidPathChars();
-            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars));
+            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars)).Trim();
 
             var xml = XDocument.Parse("<podcast>" + outerPodcast.InnerXml + "</podcast>");
             var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
