@@ -181,12 +181,12 @@ namespace EscapePod
             return Path.Combine(validPath, validFileName + "." + extension);
         }
 
-        public void SaveToDisk(IEnumerable<Podcast> podcasts)
+        public async Task SaveToDiskAsync(IEnumerable<Podcast> podcasts)
         {
             EnsureContentDirectoryExists();
 
             string json = JsonConvert.SerializeObject(podcasts);
-            File.WriteAllText(_savefilePath, json);
+            await File.WriteAllTextAsync(_savefilePath, json);
         }
 
         private void EnsureContentDirectoryExists()

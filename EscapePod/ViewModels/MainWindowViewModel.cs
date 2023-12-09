@@ -191,7 +191,6 @@ namespace EscapePod.ViewModels
             var newPodcast = await _podcastService.GetPodcastAsync(newFeedUri).ConfigureAwait(false);
 
             Podcasts.Add(newPodcast);
-            _podcastService.SaveToDisk(Podcasts);
             SelectedPodcast = newPodcast;
 
             //TODO hier noch bug fixen, dass bild erst gesetzt wird bevor es runtergeladen ist ... und dann crap binding exception kommt :C
@@ -201,9 +200,11 @@ namespace EscapePod.ViewModels
             await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
 
             SearchString = string.Empty;
+
+            await _podcastService.SaveToDiskAsync(_podcasts);
         }
 
-        public void DeletePodcast(Podcast? podcast)
+        public async Task DeletePodcastAsync(Podcast? podcast)
         {
             if (podcast == null)
             {
@@ -211,14 +212,14 @@ namespace EscapePod.ViewModels
             }
 
             Podcasts.Remove(podcast);
-            _podcastService.SaveToDisk(Podcasts);
+            await _podcastService.SaveToDiskAsync(_podcasts);
         }
 
         public async Task PlayOrPauseAsync()
         {
             if (IsPlaying)
             {
-                PauseEpisode();
+                await PauseEpisodeAsync();
             }
             else
             {
@@ -287,7 +288,7 @@ namespace EscapePod.ViewModels
             }
         }
 
-        private void PauseEpisode()
+        private async Task PauseEpisodeAsync()
         {
             if (_playingEpisode == null)
             {
@@ -299,9 +300,9 @@ namespace EscapePod.ViewModels
             _playingEpisode.Timestamp = _audioFileReader.CurrentTime.TotalSeconds;
             _playingEpisode.LastPlayed = DateTime.Now;
 
-            _podcastService.SaveToDisk(Podcasts);
-
             OnPropertyChanged(nameof(PlayOrPauseButtonContent));
+
+            await _podcastService.SaveToDiskAsync(_podcasts);
         }
 
         public void NextEpisode()
@@ -377,7 +378,7 @@ namespace EscapePod.ViewModels
                     : _selectedPodcast.EpisodeList.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
             }
 
-            _podcastService.SaveToDisk(Podcasts);
+            await _podcastService.SaveToDiskAsync(_podcasts);
         }
 
         public void SelectFirstEpisode()
@@ -520,9 +521,9 @@ namespace EscapePod.ViewModels
             }
         }
 
-        public void CloseApplication()
+        public async Task CloseApplicationAsync()
         {
-            _podcastService.SaveToDisk(_podcasts);
+            await _podcastService.SaveToDiskAsync(_podcasts);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

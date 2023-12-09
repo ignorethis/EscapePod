@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,7 +33,7 @@ namespace EscapePod
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             var podcast = (Podcast)((Button)sender).Tag;
-            vm.DeletePodcast(podcast);
+            vm.DeletePodcastAsync(podcast);
         }
 
         private async void PlayOrPause_Click(object sender, RoutedEventArgs e)
@@ -78,9 +79,9 @@ namespace EscapePod
             vm.Seek(newValue);
         }
 
-        private void OnClosing(object? sender, CancelEventArgs e)
+        private async void OnClosing(object? sender, CancelEventArgs e)
         {
-            vm.CloseApplication();
+            await vm.CloseApplicationAsync();
         }
     }
 }
