@@ -174,11 +174,12 @@ namespace EscapePod
         {
             var invalidPathChars = new List<char>(Path.GetInvalidPathChars());
             invalidPathChars.Add(':');
+            invalidPathChars.Add(',');
 
-            var validPath = string.Join("_", localPath.Split(invalidPathChars.ToArray()));
+            var validPath = string.Join("_", localPath.Split(invalidPathChars.ToArray()).Select(s => s.Trim()));
 
             var invalidFileNameChars = Path.GetInvalidFileNameChars();
-            var validFileName = string.Join("_", fileName.Split(invalidFileNameChars));
+            var validFileName = string.Join("_", fileName.Split(invalidFileNameChars).Select(s => s.Trim()));
 
             return Path.Combine(validPath, validFileName + "." + extension);
         }
