@@ -172,8 +172,10 @@ namespace EscapePod
 
         public string GetFileFullName(string localPath, string fileName, string extension)
         {
-            var invalidPathChars = Path.GetInvalidPathChars();
-            var validPath = string.Join("_", localPath.Split(invalidPathChars));
+            var invalidPathChars = new List<char>(Path.GetInvalidPathChars());
+            invalidPathChars.Add(':');
+
+            var validPath = string.Join("_", localPath.Split(invalidPathChars.ToArray()));
 
             var invalidFileNameChars = Path.GetInvalidFileNameChars();
             var validFileName = string.Join("_", fileName.Split(invalidFileNameChars));
