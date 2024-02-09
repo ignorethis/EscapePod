@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using EscapePod.Models;
-using HtmlAgilityPack;
 using iTunesPodcastFinder;
 using Newtonsoft.Json;
 
@@ -40,64 +38,6 @@ namespace EscapePod
             var getPodcastWithEpisodesResult = await podcastFinder.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
             var podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
             return podcast;
-
-            /*
-            string podcastTitle = podcast.Name;
-
-            string podcastTitleCard = (podcast.Image.Split('/').Last());
-                
-            Uri podcastTitleCardUri = new Uri(podcast.Image);
-
-            var localPodcastPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", podcastTitle);
-
-            var pod = new Podcast()
-            {
-                Url = new Uri(podcast.FeedUrl),
-                Name = podcast.Name,
-                TitleCard = new Uri(podcastTitleCard),
-                LocalTitleCardFileFullName = GetFileFullName(localPodcastPath, podcastTitle, podcastTitleCard.Split('.').Last()),
-                LocalPodcastPath = localPodcastPath
-            };
-
-                
-            List<Episode> epilist = new List<Episode>();
-            foreach (var item in podcast.Episodes)
-            {
-                string episodeTitle = item.Title;
-                    
-                StringWriter episodeTitleWriter = new StringWriter();
-                StringWriter episodeDescriptionWriter = new StringWriter();
-
-                Regex reg = new Regex(@"\d+");
-                Match match = reg.Match(item.Title);
-                if (!match.Success)
-                {
-                    continue;
-                }
-
-                int episodeNumber = int.Parse(match.Value);
-                string episodeDescription = item.Summary;
-                var episodeUrl = item.Link;
-                                        
-                DateTime? pubDateParam = null;
-                DateTime pubDate = item.PubDate;
-
-                System.Web.HttpUtility.HtmlDecode(episodeDescription,episodeDescriptionWriter);
-                episodeDescription = episodeDescriptionWriter.ToString();
-                System.Web.HttpUtility.HtmlDecode(episodeTitle,episodeTitleWriter);
-                episodeTitle = episodeTitleWriter.ToString();
-                episodeDescription = EpisodeDescriptionParser(episodeDescription);
-                double episodeTimestamp = 0.0;
-                Episode episode = new Episode(pod, episodeTitle, episodeNumber, new Uri(episodeUrl), episodeDescription, episodeTimestamp, pubDateParam);
-                    
-                episode.LocalPath = GetFileFullName(episode.Podcast.LocalPodcastPath, episode.EpisodeName, episode.EpisodeUri.AbsoluteUri.Split('.').Last());
-                    
-                epilist.Add(episode);
-            }
-
-            pod.EpisodeList = epilist;
-            */
-
         }
 
         public async Task<bool> DownloadEpisodeAsync(Episode episode)
@@ -240,42 +180,6 @@ namespace EscapePod
             }
 
             return new List<Podcast>();
-        }
-
-        public string EpisodeDescriptionParser(string descriptionText)
-        {
-            Regex link = new Regex(@"<a([A-Za-z0-9\-\._\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=""\>\s]+)</a>");
-            Regex urlFromLink = new Regex(@"""([a-zA-Z0-9.\/:]+)"">");
-            Regex titleFromLink = new Regex(@">([a-zA-Z0-9.\/:""]+)<\/a>");
-            Regex linebreaks = new Regex(@"\<br\>");
-            Regex boldText = new Regex(@"\<b\>");
-            Regex boldTextEnd = new Regex(@"\<\/b\>");
-            Regex stupidityLinebreaks = new Regex(@"\<br.\/\>");
-
-            while (true)
-            {
-                var match = link.Match(descriptionText);
-                if (!match.Success)
-                {
-                    break;
-                }
-
-                var rege = link.Options;
-                int lon = descriptionText.Length;
-                descriptionText = descriptionText.Remove(match.Index, match.Length);
-
-                var node = HtmlNode.CreateNode(match.Value);
-                var url = node.GetAttributeValue("href", string.Empty);
-                var content = node.InnerHtml;
-
-                descriptionText = descriptionText.Insert(match.Index, content + ": " + url);
-            }
-
-            descriptionText = linebreaks.Replace(descriptionText,"\n");
-            descriptionText = boldText.Replace(descriptionText,"");
-            descriptionText = boldTextEnd.Replace(descriptionText,"");
-            descriptionText = stupidityLinebreaks.Replace(descriptionText,"\n");
-            return descriptionText;
         }
 
         public Podcast PodcastConversion(iTunesPodcastFinder.Models.Podcast outerPodcast, IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
