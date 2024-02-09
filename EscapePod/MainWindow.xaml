@@ -12,8 +12,8 @@
         Width="525"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
-        Background="Black"
         Icon="/Resources/icon.ico"
+        Background="{StaticResource BackgroundColor}"
         d:DataContext="{d:DesignInstance Type=viewModels:DesignTimeViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
@@ -31,17 +31,15 @@
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0" Source="{Binding SelectedPodcast.LocalTitleCardFileFullName}" />
             <ScrollViewer Grid.Column="1" VerticalAlignment="Center" VerticalScrollBarVisibility="Auto">
-                <TextBlock Text="{Binding SelectedEpisode.Description}" Foreground="White" TextWrapping="Wrap" Margin="5" TextAlignment="Center" />
+                <TextBlock Text="{Binding SelectedEpisode.Description}" TextWrapping="Wrap" Margin="5" TextAlignment="Center" />
             </ScrollViewer>
         </Grid>
-        <ProgressBar x:Name="progressBar" Grid.Row="1" Width="auto" Height="10" Value="{Binding PlayingEpisode.Timestamp}" Maximum="{Binding PlayingEpisode.EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" Background="Black" Foreground="Gray"/>
+        <ProgressBar x:Name="progressBar" Grid.Row="1" Width="auto" Height="10" Value="{Binding PlayingEpisode.Timestamp}" Maximum="{Binding PlayingEpisode.EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" />
         <StackPanel Orientation="Horizontal" Grid.Row="2">
             <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}">
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                     <Setter Property="Width" Value="100" />
                     <Setter Property="Height" Value="25" />
-                    <Setter Property="Background" Value="Black"/>
-                    <Setter Property="Foreground" Value="White"/>
                 </Style>
             </StackPanel.Resources>
             <Button Content="{Binding PlayOrPauseButtonContent}" Click="PlayOrPause_Click" />
@@ -60,22 +58,20 @@
                 <escapePod:TextBoxWithPlaceholder
                     Grid.Column="0"
                     Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}"
-                    Background="Black"
-                    Foreground="White"
                     Height="25"
                     Placeholder="{Binding SearchPlaceholder}"
                     VerticalContentAlignment="Center" />
-                <Button Grid.Column="1" Content="Add" Height="25" Click="Add_Click" Background="Black" Foreground="White" Padding="5, 0" />
+                <Button Grid.Column="1" Content="Add" Height="25" Click="Add_Click" Padding="5, 0" />
             </Grid>
-            <Slider Maximum="1.0" Background="Black" TickPlacement="BottomRight" TickFrequency="0.10" Value="{Binding Volume}" />
+            <Slider Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.10" Value="{Binding Volume}" />
         </StackPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ListBox Grid.ColumnSpan="2" Panel.ZIndex="{Binding SearchListBoxIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SearchPodcasts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" SelectedItem="{Binding SelectedSearchPodcast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" DisplayMemberPath="Name" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch"/>
-            <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Black" Foreground="White" HorizontalContentAlignment="Stretch">
+            <ListBox Grid.ColumnSpan="2" Panel.ZIndex="{Binding SearchListBoxIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SearchPodcasts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" SelectedItem="{Binding SelectedSearchPodcast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" DisplayMemberPath="Name" HorizontalContentAlignment="Stretch"/>
+            <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -84,7 +80,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                            <Button Grid.Column="1" Content="-" Tag="{Binding}" Width="16" Height="16" Background="Black" Foreground="White" Click="Delete_Click" />
+                            <Button Grid.Column="1" Content="-" Tag="{Binding}" Width="16" Height="16" Click="Delete_Click" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -93,8 +89,6 @@
                 ItemsSource="{Binding SelectedPodcast.EpisodeList}"
                 SelectedItem="{Binding SelectedEpisode}"
                 MouseDoubleClick="EpisodeList_DoubleClick"
-                Background="Black"
-                Foreground="White"
                 escapePod:ScrollCurrentItemIntoViewBehavior.AutoScrollToCurrentItem="True"
                 HorizontalContentAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -111,7 +105,7 @@
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding EpisodeFinished}" Value="true">
-                                                <Setter Property="Background" Value="Gray" />
+                                                <Setter Property="Background" Value="{StaticResource AccentDimColor}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -123,6 +117,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <TextBlock Grid.Row="5" Text="{Binding Path=Status}" Foreground="White" Padding="5" />
+        <TextBlock Grid.Row="5" Text="{Binding Path=Status}" Padding="5" />
     </Grid>
 </Window>
