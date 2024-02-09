@@ -196,8 +196,12 @@ namespace EscapePod.ViewModels
             //TODO hier noch bug fixen, dass bild erst gesetzt wird bevor es runtergeladen ist ... und dann crap binding exception kommt :C
             await _podcastService.DownloadTitleCardAsync(newPodcast);
 
-            await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
-            await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
+            var firstSuccess =  await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
+            var lastSuccess = await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
+            if (!firstSuccess || !lastSuccess)
+            {
+                // TODO inform user
+            }
 
             SearchString = string.Empty;
 
@@ -235,7 +239,11 @@ namespace EscapePod.ViewModels
                 return;
             }
 
-            await _podcastService.DownloadEpisodeAsync(SelectedEpisode);
+            var success = await _podcastService.DownloadEpisodeAsync(SelectedEpisode);
+            if (!success)
+            {
+                return; // TODO: inform user
+            }
 
             if (_waveOutDevice.PlaybackState == PlaybackState.Playing
                 || _waveOutDevice.PlaybackState == PlaybackState.Paused)
@@ -276,9 +284,16 @@ namespace EscapePod.ViewModels
 
                     if (!nextEpisode.IsDownloading)
                     {
-                        await _podcastService.DownloadEpisodeAsync(nextEpisode);
-                        nextEpisode.IsDownloading = false;
-                        nextEpisode.IsDownloaded = true;
+                        var success = await _podcastService.DownloadEpisodeAsync(nextEpisode);
+                        if (success)
+                        {
+                            nextEpisode.IsDownloading = false;
+                            nextEpisode.IsDownloaded = true;
+                        }
+                        else
+                        {
+                            // TODO inform user
+                        }
                     }
                 }
             }

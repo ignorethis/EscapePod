@@ -100,11 +100,11 @@ namespace EscapePod
 
         }
 
-        public async Task DownloadEpisodeAsync(Episode episode)
+        public async Task<bool> DownloadEpisodeAsync(Episode episode)
         {
             if (File.Exists(episode.LocalPath) && episode.IsDownloaded)
             {
-                return;
+                return true;
             }
 
             var extension = GetExtensionFromMimeType(episode.AudioFileType);
@@ -115,8 +115,17 @@ namespace EscapePod
                     episode.EpisodeName,
                     extension)
                 .ConfigureAwait(false);
+
+            if (fileFullName is null)
+            {
+                // TODO: über fehler aufklären, dass der dl nicht erfolgreich war.
+                return false;
+            }
+
             episode.LocalPath = fileFullName;
             episode.IsDownloaded = true;
+
+            return true;
         }
 
         //doc http://streaming.osu.edu/podcast/Example/Podcast.xml Podcast Supported Enclosures
@@ -156,13 +165,13 @@ namespace EscapePod
             });
         }
 
-        public async Task<string> DownloadFileAsync(Uri uri, string path, string name, string extension)
+        public async Task<string?> DownloadFileAsync(Uri uri, string path, string name, string extension)
         {
             var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 // TODO: wir brauchen eine möglichkeit um fehler anzuzeigen.
-                return string.Empty;
+                return null;
             }
 
             var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
