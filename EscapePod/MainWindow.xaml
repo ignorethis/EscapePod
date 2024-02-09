@@ -17,14 +17,13 @@
         Icon="/Resources/icon.ico"
         d:DataContext="{d:DesignInstance Type=viewModels:DesignTimeViewModel, IsDesignTimeCreatable=True}">
     <Grid>
-        <Grid.ColumnDefinitions/>
-            
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Height="200">
             <Grid.ColumnDefinitions>
@@ -125,5 +124,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
+        <TextBlock Grid.Row="5" Text="{Binding Path=Status}" Foreground="White" Padding="5" />
     </Grid>
 </Window>

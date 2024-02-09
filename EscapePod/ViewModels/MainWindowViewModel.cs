@@ -16,6 +16,8 @@ namespace EscapePod.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        private readonly string _couldNotDownloadEpisodeError = "Could not download the episode.";
+
         private PodcastService _podcastService = new PodcastService();
 
         protected ObservableCollection<Podcast> _podcasts;
@@ -31,6 +33,8 @@ namespace EscapePod.ViewModels
         IWavePlayer _waveOutDevice = new WaveOutEvent();
         AudioFileReader _audioFileReader;
         private float _volume;
+
+        private string _status;
 
         public MainWindowViewModel()
         {
@@ -55,6 +59,24 @@ namespace EscapePod.ViewModels
         public string SearchPlaceholder => "Search for podcasts";
 
         public bool IsPlaying => _waveOutDevice.PlaybackState == PlaybackState.Playing;
+
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+
+                Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+
+                    _status = string.Empty;
+                    OnPropertyChanged();
+                });
+            }
+        }
 
         public int SearchListBoxIndex
         {
@@ -197,10 +219,14 @@ namespace EscapePod.ViewModels
             await _podcastService.DownloadTitleCardAsync(newPodcast);
 
             var firstSuccess =  await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.First()).ConfigureAwait(false);
-            var lastSuccess = await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
-            if (!firstSuccess || !lastSuccess)
+            if (!firstSuccess)
             {
-                // TODO inform user
+                Status = _couldNotDownloadEpisodeError;
+            }
+            var lastSuccess = await _podcastService.DownloadEpisodeAsync(newPodcast.EpisodeList.Last()).ConfigureAwait(false);
+            if (!lastSuccess)
+            {
+                Status = _couldNotDownloadEpisodeError;
             }
 
             SearchString = string.Empty;
@@ -242,7 +268,8 @@ namespace EscapePod.ViewModels
             var success = await _podcastService.DownloadEpisodeAsync(SelectedEpisode);
             if (!success)
             {
-                return; // TODO: inform user
+                Status = _couldNotDownloadEpisodeError;
+                return;
             }
 
             if (_waveOutDevice.PlaybackState == PlaybackState.Playing
@@ -292,11 +319,13 @@ namespace EscapePod.ViewModels
                         }
                         else
                         {
-                            // TODO inform user
+                            Status = _couldNotDownloadEpisodeError;
+                            return;
                         }
                     }
                 }
             }
+
             if (_audioFileReader.CurrentTime.TotalSeconds > (EpisodeLength * 0.95))
             {
                 _selectedEpisode.EpisodeFinished = true;
