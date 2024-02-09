@@ -189,8 +189,6 @@ namespace EscapePod
 
             var invalidFileNameChars = new List<char>(Path.GetInvalidFileNameChars());
             invalidFileNameChars.Add('.');
-            invalidFileNameChars.Add('`');
-            invalidFileNameChars.Add('´');
             var validFileName = string.Join("_", fileName.Split(invalidFileNameChars.ToArray()).Select(s => s.Trim()));
 
             return Path.Combine(validPath, validFileName + "." + extension);
