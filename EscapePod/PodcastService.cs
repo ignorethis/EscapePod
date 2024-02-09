@@ -102,15 +102,21 @@ namespace EscapePod
 
         public async Task DownloadEpisodeAsync(Episode episode)
         {
-            if (!File.Exists(episode.LocalPath) || !episode.IsDownloaded)
+            if (File.Exists(episode.LocalPath) && episode.IsDownloaded)
             {
-                var extension = GetExtensionFromMimeType(episode.AudioFileType);
-
-                var fileFullName = await DownloadFileAsync(episode.EpisodeUri, episode.Podcast.LocalPodcastPath, episode.EpisodeName, extension)
-                    .ConfigureAwait(false);
-                episode.LocalPath = fileFullName;
-                episode.IsDownloaded = true;
+                return;
             }
+
+            var extension = GetExtensionFromMimeType(episode.AudioFileType);
+
+            var fileFullName = await DownloadFileAsync(
+                    episode.EpisodeUri,
+                    episode.Podcast.LocalPodcastPath,
+                    episode.EpisodeName,
+                    extension)
+                .ConfigureAwait(false);
+            episode.LocalPath = fileFullName;
+            episode.IsDownloaded = true;
         }
 
         //doc http://streaming.osu.edu/podcast/Example/Podcast.xml Podcast Supported Enclosures
@@ -153,6 +159,12 @@ namespace EscapePod
         public async Task<string> DownloadFileAsync(Uri uri, string path, string name, string extension)
         {
             var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                // TODO: wir brauchen eine möglichkeit um fehler anzuzeigen.
+                return string.Empty;
+            }
+
             var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var fileFullName = GetFileFullName(path, name, extension);
@@ -173,13 +185,13 @@ namespace EscapePod
         public string GetFileFullName(string localPath, string fileName, string extension)
         {
             var invalidPathChars = new List<char>(Path.GetInvalidPathChars());
-            invalidPathChars.Add(':');
-            invalidPathChars.Add(',');
-
             var validPath = string.Join("_", localPath.Split(invalidPathChars.ToArray()).Select(s => s.Trim()));
 
-            var invalidFileNameChars = Path.GetInvalidFileNameChars();
-            var validFileName = string.Join("_", fileName.Split(invalidFileNameChars).Select(s => s.Trim()));
+            var invalidFileNameChars = new List<char>(Path.GetInvalidFileNameChars());
+            invalidFileNameChars.Add('.');
+            invalidFileNameChars.Add('`');
+            invalidFileNameChars.Add('´');
+            var validFileName = string.Join("_", fileName.Split(invalidFileNameChars.ToArray()).Select(s => s.Trim()));
 
             return Path.Combine(validPath, validFileName + "." + extension);
         }
@@ -273,8 +285,10 @@ namespace EscapePod
 
         private Podcast GetPodcastFrom(iTunesPodcastFinder.Models.Podcast outerPodcast)
         {
-            var invalidChars = Path.GetInvalidPathChars();
-            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars)).Trim();
+            var invalidChars = new List<char>(Path.GetInvalidPathChars());
+            invalidChars.Add(':');
+
+            var validPathName = string.Join("_", outerPodcast.Name.Split(invalidChars.ToArray())).Trim();
 
             var xml = XDocument.Parse("<podcast>" + outerPodcast.InnerXml + "</podcast>");
             var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
