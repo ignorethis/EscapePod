@@ -26,18 +26,19 @@ namespace EscapePod
 
         public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcastAsync(string searchValue)
         {
-            var podcastFinder = new PodcastFinder();
-            return await podcastFinder.SearchPodcastsAsync(searchValue)
+            return await new PodcastFinder()
+                .SearchPodcastsAsync(searchValue)
                 .ConfigureAwait(false);
         }
 
         public async Task<Podcast> GetPodcastAsync(Uri podcastUrl)
         {
-            var podcastFinder = new PodcastFinder();
             PodcastFinder.HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0");
-            var getPodcastWithEpisodesResult = await podcastFinder.GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
-            var podcast = PodcastConversion(getPodcastWithEpisodesResult.Podcast, getPodcastWithEpisodesResult.Episodes);
-            return podcast;
+
+            var podcastWithEpisodes = await new PodcastFinder()
+                .GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
+
+            return PodcastConversion(podcastWithEpisodes.Podcast, podcastWithEpisodes.Episodes);
         }
 
         public async Task<bool> DownloadEpisodeAsync(Episode episode)
@@ -58,7 +59,6 @@ namespace EscapePod
 
             if (fileFullName is null)
             {
-                // TODO: über fehler aufklären, dass der dl nicht erfolgreich war.
                 return false;
             }
 
@@ -163,23 +163,23 @@ namespace EscapePod
 
         public List<Podcast> LoadFromDisk()
         {
-            if (File.Exists(_savefilePath))
+            if (!File.Exists(_savefilePath))
             {
-                string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
-                var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent);
-
-                foreach (var podcast in podcasts)
-                {
-                    foreach (var episode in podcast.EpisodeList)
-                    {
-                        episode.Podcast = podcast;
-                    }
-                }
-
-                return podcasts;
+                return new List<Podcast>();
             }
 
-            return new List<Podcast>();
+            string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
+            var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent);
+            foreach (var podcast in podcasts)
+            {
+                foreach (var episode in podcast.EpisodeList)
+                {
+                    episode.Podcast = podcast;
+                }
+            }
+
+            return podcasts;
+
         }
 
         public Podcast PodcastConversion(iTunesPodcastFinder.Models.Podcast outerPodcast, IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
