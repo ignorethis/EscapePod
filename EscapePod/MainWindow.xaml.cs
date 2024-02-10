@@ -84,6 +84,7 @@ namespace EscapePod
 
         private void ProgressBar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            var progressBar = (ProgressBar)sender;
             var positionX = e.GetPosition(progressBar).X;
             double ratio = positionX / progressBar.ActualWidth;
             var newValue = ratio * progressBar.Maximum;

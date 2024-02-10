@@ -34,7 +34,7 @@
                 <TextBlock Text="{Binding SelectedEpisode.Description}" TextWrapping="Wrap" Margin="5" TextAlignment="Center" />
             </ScrollViewer>
         </Grid>
-        <ProgressBar x:Name="progressBar" Grid.Row="1" Width="auto" Height="10" Value="{Binding PlayingEpisode.Timestamp}" Maximum="{Binding PlayingEpisode.EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" />
+        <ProgressBar Grid.Row="1" Width="auto" Height="10" Value="{Binding PlayingEpisode.Timestamp}" Maximum="{Binding PlayingEpisode.EpisodeLength}" MouseLeftButtonUp="ProgressBar_MouseLeftButtonUp" />
         <StackPanel Orientation="Horizontal" Grid.Row="2">
             <StackPanel.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -109,12 +109,14 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ProgressBar
+                                Grid.Column="0"
                                 BorderThickness="0"
                                 Value="{Binding EpisodeProgress, Mode=OneWay}"
                                 Foreground="{StaticResource BackgroundDimColor}"
                                 Width="Auto"
                                 Panel.ZIndex="-1" />
                             <TextBlock
+                                Grid.Column="0"
                                 Text="{Binding EpisodeName}"
                                 TextTrimming="CharacterEllipsis">
                                 <TextBlock.Style>
