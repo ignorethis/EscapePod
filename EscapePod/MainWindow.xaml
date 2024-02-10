@@ -57,7 +57,7 @@
                 </Grid.ColumnDefinitions>
                 <escapePod:TextBoxWithPlaceholder
                     Grid.Column="0"
-                    Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}"
+                    Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100}"
                     Height="25"
                     Placeholder="{Binding SearchPlaceholder}"
                     VerticalContentAlignment="Center" />
@@ -70,7 +70,15 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ListBox Grid.ColumnSpan="2" Panel.ZIndex="{Binding SearchListBoxIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SearchPodcasts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" SelectedItem="{Binding SelectedSearchPodcast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" DisplayMemberPath="Name" HorizontalContentAlignment="Stretch"/>
+            <ListBox
+                Grid.ColumnSpan="2"
+                Panel.ZIndex="{Binding SearchListBoxIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding SearchPodcasts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding SelectedSearchPodcast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                DisplayMemberPath="Name"
+                HorizontalContentAlignment="Stretch"
+                MouseDoubleClick="SearchListBox_DoubleClick"
+                />
             <ListBox Grid.Column="0" Name="PodcastBox" ItemsSource="{Binding Podcasts}" SelectedItem="{Binding SelectedPodcast}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

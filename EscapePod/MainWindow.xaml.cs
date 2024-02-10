@@ -24,10 +24,22 @@ namespace EscapePod
 
         private async void Add_Click(object sender, RoutedEventArgs e)
         {
-            if (vm.SelectedSearchPodcast != null)
+            if (vm.SelectedSearchPodcast == null)
             {
-                await vm.AddPodcastAsync();
+                return;
             }
+
+            await vm.AddPodcastAsync();
+        }
+
+        private async void SearchListBox_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (vm.SelectedSearchPodcast == null)
+            {
+                return;
+            }
+
+            await vm.AddPodcastAsync();
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
