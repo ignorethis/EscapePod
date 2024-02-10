@@ -5,6 +5,7 @@
     <SolidColorBrush x:Key="AccentColor" Color="White" />
     <SolidColorBrush x:Key="AccentDimColor" Color="Gray" />
     <SolidColorBrush x:Key="BackgroundColor" Color="Black" />
+    <SolidColorBrush x:Key="BackgroundDimColor" Color="DimGray" />
 
     <Style TargetType="{x:Type ListBox}">
         <Setter Property="Foreground" Value="{StaticResource AccentColor}" />

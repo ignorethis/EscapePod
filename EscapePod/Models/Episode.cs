@@ -96,6 +96,7 @@ namespace EscapePod.Models
             {
                 _timestamp = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(EpisodeProgress));
             }
         }
 
@@ -128,6 +129,7 @@ namespace EscapePod.Models
             {
                 _episodeLength = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(EpisodeProgress));
             }
         }
 
@@ -140,6 +142,8 @@ namespace EscapePod.Models
                 OnPropertyChanged();
             }
         }
+
+        public double EpisodeProgress => _timestamp / _episodeLength * 100;
 
         public string Subtitle => _subtitle;
 

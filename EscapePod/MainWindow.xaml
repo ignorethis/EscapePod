@@ -108,7 +108,15 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding EpisodeName}" TextTrimming="CharacterEllipsis">
+                            <ProgressBar
+                                BorderThickness="0"
+                                Value="{Binding EpisodeProgress, Mode=OneWay}"
+                                Foreground="{StaticResource BackgroundDimColor}"
+                                Width="Auto"
+                                Panel.ZIndex="-1" />
+                            <TextBlock
+                                Text="{Binding EpisodeName}"
+                                TextTrimming="CharacterEllipsis">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
