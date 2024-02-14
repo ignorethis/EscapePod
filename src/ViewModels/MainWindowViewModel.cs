@@ -341,23 +341,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Podcasts.Add(newPodcast);
 
-        //TODO hier noch bug fixen, dass bild erst gesetzt wird bevor es runtergeladen ist ... und dann crap binding exception kommt :C
         newPodcast.ImageLocalPath = await _podcastService.DownloadImage(newPodcast);
 
         SearchValue = string.Empty;
 
         await _podcastService.SaveToDisk(Podcasts);
-
-        var firstSuccess =  await _podcastService.DownloadEpisode(newPodcast, newPodcast.Episodes.First()).ConfigureAwait(false);
-        if (!firstSuccess)
-        {
-            Status = _couldNotDownloadEpisodeError;
-        }
-        var lastSuccess = await _podcastService.DownloadEpisode(newPodcast, newPodcast.Episodes.Last()).ConfigureAwait(false);
-        if (!lastSuccess)
-        {
-            Status = _couldNotDownloadEpisodeError;
-        }
     }
 
     [RelayCommand]
