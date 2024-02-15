@@ -356,6 +356,14 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        if (podcast == _selectedPodcast) 
+        {
+            //SelectedPodcastImage = null;
+            
+            SelectedPodcast = null;
+            SelectedEpisode = null;
+            OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
+        }
         Podcasts.Remove(podcast);
 
         await _podcastService.SaveToDisk(Podcasts);

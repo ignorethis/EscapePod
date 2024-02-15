@@ -22,14 +22,7 @@
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto, Auto">
         <Grid Grid.Row="0" Grid.Column="0" Height="200" ColumnDefinitions="Auto,*">
             <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />
-            <WebView Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
-            <!-- <ScrollViewer Grid.Column="1" VerticalAlignment="Center" VerticalScrollBarVisibility="Auto"> -->
-            <!--     <TextBlock -->
-            <!--         Margin="5" -->
-            <!--         Text="{Binding SelectedEpisode.Description}" -->
-            <!--         TextWrapping="Wrap" -->
-            <!--         TextAlignment="Center" /> -->
-            <!-- </ScrollViewer> -->
+            <WebView Name="Webview" Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
         </Grid>
         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
             <StackPanel.Styles>
