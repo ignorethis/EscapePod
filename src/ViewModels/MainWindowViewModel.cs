@@ -80,34 +80,36 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsSearching => !string.IsNullOrEmpty(SearchValue);
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
 
+    private readonly string _episodeDescriptionHtmlStyledTemplate = """
+        <html>
+        <head>
+            <style>
+                body {{
+                    background-color: black;
+                    color: white;
+                }}
+        
+                a {{
+                    color: white;
+                }}
+            </style>
+        </head>
+        <body>
+            {0}
+        </body>
+        </html>
+        """;
+
     public string EpisodeDescriptionHtmlStyled
     {
         get
         {
             if (_selectedEpisode is null)
             {
-                return string.Empty;
+                return string.Format(_episodeDescriptionHtmlStyledTemplate, string.Empty);
             }
 
-            return $$"""
-                   <html>
-                   <head>
-                     <style>
-                       body {
-                           background-color: black;
-                           color: white;
-                       }
-                       
-                       a {
-                            color: white;
-                       }
-                     </style>
-                   </head>
-                   <body>
-                     {{_selectedEpisode.Description}}
-                   </body>
-                   </html>
-                   """;
+            return string.Format(_episodeDescriptionHtmlStyledTemplate, _selectedEpisode.Description);
         }
     }
 
@@ -362,7 +364,6 @@ public partial class MainWindowViewModel : ViewModelBase
             
             SelectedPodcast = null;
             SelectedEpisode = null;
-            OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
         }
         Podcasts.Remove(podcast);
 
@@ -391,8 +392,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
     }
-
-
 
     partial void OnSearchValueChanged(string value)
     {
