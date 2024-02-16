@@ -360,7 +360,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (podcast == _selectedPodcast) 
         {
-            //SelectedPodcastImage = null;
+            SelectedPodcastImage = null;
             
             SelectedPodcast = null;
             SelectedEpisode = null;
