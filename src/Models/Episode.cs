@@ -34,7 +34,12 @@ public sealed class Episode : ObservableObject
         get => _length;
         set
         {
-            if (SetProperty(ref _length, value)) OnPropertyChanged(nameof(ListenPercent));
+            if (!SetProperty(ref _length, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(ListenPercent));
         }
     }
 
@@ -44,7 +49,12 @@ public sealed class Episode : ObservableObject
         get => _listenLastAt;
         set
         {
-            if (SetProperty(ref _listenLastAt, value)) OnPropertyChanged(nameof(ListenPercent));
+            if (!SetProperty(ref _listenLastAt, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(ListenPercent));
         }
     }
 
@@ -54,7 +64,12 @@ public sealed class Episode : ObservableObject
         get => _listenStoppedAt;
         set
         {
-            if (SetProperty(ref _listenStoppedAt, value)) OnPropertyChanged(nameof(ListenPercent));
+            if (!SetProperty(ref _listenStoppedAt, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(ListenPercent));
         }
     }
 

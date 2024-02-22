@@ -41,16 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public iTunesPodcastFinder.Models.Podcast? SelectedSearchPodcast
     {
         get => _selectedSearchPodcast;
-        set
-        {
-            if (_selectedSearchPodcast == value)
-            {
-                return;
-            }
-
-            _selectedSearchPodcast = value;
-            OnPropertyChanged();
-        }
+        set => SetProperty(ref _selectedSearchPodcast, value);
     }
 
     public Podcast? SelectedPodcast
@@ -58,12 +49,10 @@ public partial class MainWindowViewModel : ViewModelBase
         get => _selectedPodcast;
         set
         {
-            if (_selectedPodcast == value)
+            if (!SetProperty(ref _selectedPodcast, value))
             {
                 return;
             }
-
-            _selectedPodcast = value;
 
             if (!string.IsNullOrEmpty(value?.ImageLocalPath) && File.Exists(value.ImageLocalPath))
             {
@@ -71,24 +60,13 @@ public partial class MainWindowViewModel : ViewModelBase
                 // Switch once updated and make async
                 //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
             }
-
-            OnPropertyChanged();
         }
     }
 
     public Bitmap? SelectedPodcastImage
     {
         get => _selectedPodcastImage;
-        set
-        {
-            if (_selectedPodcastImage == value)
-            {
-                return;
-            }
-
-            _selectedPodcastImage = value;
-            OnPropertyChanged();
-        }
+        set => SetProperty(ref _selectedPodcastImage, value);
     }
 
     public Episode? SelectedEpisode
@@ -96,13 +74,11 @@ public partial class MainWindowViewModel : ViewModelBase
         get => _selectedEpisode;
         set
         {
-            if (_selectedEpisode == value)
+            if (!SetProperty(ref _selectedEpisode, value))
             {
                 return;
             }
 
-            _selectedEpisode = value;
-            OnPropertyChanged();
             OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
         }
     }
@@ -110,16 +86,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public Episode? PlayingEpisode
     {
         get => _playingEpisode;
-        set
-        {
-            if (_playingEpisode == value)
-            {
-                return;
-            }
-
-            _playingEpisode = value;
-            OnPropertyChanged();
-        }
+        set => SetProperty(ref _playingEpisode, value);
     }
 
     public string SearchValue
@@ -127,15 +94,12 @@ public partial class MainWindowViewModel : ViewModelBase
         get => _searchValue;
         set
         {
-            if (_searchValue == value)
+            if (!SetProperty(ref _searchValue, value))
             {
                 return;
             }
 
-            _searchValue = value;
             PodcastSearch(value).ConfigureAwait(true);
-
-            OnPropertyChanged();
             OnPropertyChanged(nameof(SearchListBoxIndex));
         }
     }
@@ -145,26 +109,21 @@ public partial class MainWindowViewModel : ViewModelBase
         get => _status;
         set
         {
-            if (_status == value)
+            if (!SetProperty(ref _status, value))
             {
                 return;
             }
 
-            _status = value;
-            OnPropertyChanged();
-
             Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(5));
-
-                _status = string.Empty;
-                OnPropertyChanged();
+                SetProperty(ref _status, string.Empty);
             });
         }
     }
 
     public AvaloniaList<Podcast> Podcasts { get; init; } = [];
-    public AvaloniaList<iTunesPodcastFinder.Models.Podcast> SearchPodcasts { get; init; } = [];
+    public AvaloniaList<iTunesPodcastFinder.Models.Podcast> SearchPodcasts { get; } = [];
 
     public float Volume
     {
