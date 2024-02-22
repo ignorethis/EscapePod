@@ -10,12 +10,12 @@
         mc:Ignorable="d"
         d:DesignWidth="600"
         d:DesignHeight="800"
-        Width="600"
-        Height="800"
         x:Class="EscapePod.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Height="800"
         Icon="/Assets/icon.ico"
-        Title="EscapePod">
+        Title="EscapePod"
+        Width="600">
 
     <Design.DataContext>
         <vm:MainWindowViewModelDesign />
@@ -26,37 +26,55 @@
             <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />
             <WebView Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
         </Grid>
+
         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
             <StackPanel.Styles>
                 <Style Selector="Button">
                     <Setter Property="Width" Value="100" />
                 </Style>
             </StackPanel.Styles>
+
             <Button
                 Command="{Binding PlayOrPauseEpisodeCommand}"
                 CommandParameter="{Binding SelectedEpisode}"
                 Content="{Binding PlayOrPauseButtonContent}" />
-            <Button Content="Next" Command="{Binding NextEpisodeCommand}" />
-            <Button Content="Previous" Command="{Binding PreviousEpisodeCommand}"/>
-            <Button Content="Update" Command="{Binding UpdateAllPodcastsCommand}" />
-            <Button Content="Last" Command="{Binding SelectLastEpisodeCommand}"/>
-            <Button Content="First" Command="{Binding SelectFirstEpisodeCommand}"/>
+            <Button Command="{Binding NextEpisodeCommand}" Content="Next" />
+            <Button Command="{Binding PreviousEpisodeCommand}" Content="Previous" />
+            <Button Command="{Binding UpdateAllPodcastsCommand}" Content="Update" />
+            <Button Command="{Binding SelectLastEpisodeCommand}" Content="Last"/>
+            <Button Command="{Binding SelectFirstEpisodeCommand}" Content="First"/>
         </StackPanel>
+
         <DockPanel Grid.Row="3">
-            <Slider DockPanel.Dock="Right" Width="100" Padding="8,0" Maximum="1.0" TickPlacement="None" TickFrequency="0.10" Value="{Binding Volume}" />
-            <Slider Padding="8,0" Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}" TickPlacement="None" TickFrequency="1" Value="{Binding PlayingEpisodeListenProgress}" />
+            <Slider
+                DockPanel.Dock="Right"
+                Maximum="1.0"
+                Padding="8,0"
+                TickFrequency="0.10"
+                TickPlacement="None"
+                Value="{Binding Volume}"
+                Width="100" />
+
+            <Slider
+                Padding="8,0"
+                Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}"
+                TickPlacement="None"
+                TickFrequency="1"
+                Value="{Binding PlayingEpisodeListenProgress}" />
         </DockPanel>
 
-        <TextBox Grid.Row="4"
+        <TextBox
+            Grid.Row="4"
             Text="{Binding SearchValue}"
             Watermark="Search for podcasts" />
+
         <Grid Grid.Row="5" Grid.Column="0" ColumnDefinitions="*,*">
             <ListBox
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                ZIndex="{Binding SearchListBoxIndex, Mode=OneWay}"
                 ItemsSource="{Binding SearchPodcasts, Mode=OneWay}"
-                SelectedValue="{Binding SelectedSearchPodcast, Mode=TwoWay}">
+                SelectedValue="{Binding SelectedSearchPodcast, Mode=TwoWay}"
+                ZIndex="{Binding SearchListBoxIndex, Mode=OneWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type iTunes:Podcast}">
                         <DockPanel>
@@ -67,12 +85,14 @@
                                         CommandParameter="{Binding}" />
                                 </ia:EventTriggerBehavior>
                             </i:Interaction.Behaviors>
+
                             <Button
                                 DockPanel.Dock="Right"
                                 Content="+"
                                 Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).AddPodcastCommand}"
                                 CommandParameter="{Binding}"
                                 Margin="2" />
+
                             <TextBlock
                                 Padding="8"
                                 Text="{Binding Name}"
@@ -81,11 +101,12 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+
             <ListBox
                 Grid.Column="0"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ItemsSource="{Binding Podcasts}"
-                SelectedItem="{Binding SelectedPodcast}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                SelectedItem="{Binding SelectedPodcast}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Podcast}">
                         <DockPanel>
@@ -103,12 +124,14 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox Grid.Column="1"
-                ItemsSource="{Binding SelectedPodcast.Episodes}"
-                SelectedItem="{Binding SelectedEpisode}"
-                AutoScrollToSelectedItem="True"
+
+            <ListBox
+                Grid.Column="1"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                AutoScrollToSelectedItem="True"
+                ItemsSource="{Binding SelectedPodcast.Episodes}"
+                SelectedItem="{Binding SelectedEpisode}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Episode}">
                         <Grid ColumnDefinitions="*,Auto">
@@ -121,25 +144,32 @@
                                 VerticalAlignment="Stretch"
                                 Foreground="{StaticResource ThemeForegroundColor}"
                                 Background="Transparent" />
+
                             <DockPanel Grid.Column="0">
                                 <Button
                                     DockPanel.Dock="Right"
                                     Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayOrPauseEpisodeCommand}"
                                     CommandParameter="{Binding}"
                                     Content=">"
-                                    Margin="2">
-                                </Button>
+                                    Margin="2" />
+
                                 <TextBlock
                                     Padding="8"
                                     Text="{Binding Name}"
                                     TextTrimming="CharacterEllipsis" />
                             </DockPanel>
+
                             <!--zeichen wird grad abgespielt-->
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding Path=Status}" Padding="5" />
+
+        <TextBlock
+            Grid.Row="6"
+            Grid.Column="0"
+            Padding="5"
+            Text="{Binding Path=Status}" />
     </Grid>
 </Window>
