@@ -342,6 +342,8 @@ public partial class MainWindowViewModel : ViewModelBase
             _audioPlayer.Stop();
         }
 
+        PlayingEpisode = episode;
+
         _audioFileReader = new AudioFileReader(episode.EpisodeLocalPath);
         _audioPlayer.Init(_audioFileReader);
         _audioFileReader.CurrentTime = episode.ListenStoppedAt ?? TimeSpan.Zero;
@@ -349,8 +351,6 @@ public partial class MainWindowViewModel : ViewModelBase
         _episodeIsPlayingTimer.Start();
 
         episode.Length = _audioFileReader.TotalTime;
-
-        PlayingEpisode = episode;
 
         OnPropertyChanged(nameof(PlayOrPauseButtonContent));
         OnPropertyChanged(nameof(PlayingEpisodeListenProgress));

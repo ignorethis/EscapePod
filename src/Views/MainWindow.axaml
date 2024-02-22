@@ -146,6 +146,14 @@
                                 Background="Transparent" />
 
                             <DockPanel Grid.Column="0">
+                                <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                        <ia:InvokeCommandAction
+                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayEpisodeCommand}"
+                                            CommandParameter="{Binding}" />
+                                    </ia:EventTriggerBehavior>
+                                </i:Interaction.Behaviors>
+
                                 <Button
                                     DockPanel.Dock="Right"
                                     Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayOrPauseEpisodeCommand}"
