@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
 using Avalonia.Media.Imaging;
-using Cairo;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EscapePod.Models;
 using NAudio.Wave;
@@ -25,13 +23,145 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private AudioFileReader? _audioFileReader;
 
-    [ObservableProperty] private iTunesPodcastFinder.Models.Podcast? _selectedSearchPodcast;
-    [ObservableProperty] private Podcast? _selectedPodcast;
-    [ObservableProperty] private Bitmap? _selectedPodcastImage;
-    [ObservableProperty] private Episode? _selectedEpisode;
-    [ObservableProperty] private Episode? _playingEpisode;
-    [ObservableProperty] private string _searchValue = string.Empty;
-    [ObservableProperty] private string _status = string.Empty;
+    private iTunesPodcastFinder.Models.Podcast? _selectedSearchPodcast;
+    private Podcast? _selectedPodcast;
+    private Bitmap? _selectedPodcastImage;
+    private Episode? _selectedEpisode;
+    private Episode? _playingEpisode;
+    private string _searchValue = string.Empty;
+    private string _status = string.Empty;
+
+    public MainWindowViewModel()
+    {
+        var podcasts = _podcastService.LoadFromDisk();
+        Podcasts.AddRange(podcasts);
+        _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
+    }
+
+    public iTunesPodcastFinder.Models.Podcast? SelectedSearchPodcast
+    {
+        get => _selectedSearchPodcast;
+        set
+        {
+            if (_selectedSearchPodcast == value)
+            {
+                return;
+            }
+
+            _selectedSearchPodcast = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Podcast? SelectedPodcast
+    {
+        get => _selectedPodcast;
+        set
+        {
+            if (_selectedPodcast == value)
+            {
+                return;
+            }
+
+            _selectedPodcast = value;
+
+            if (!string.IsNullOrEmpty(value?.ImageLocalPath) && File.Exists(value.ImageLocalPath))
+            {
+                SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
+                // Switch once updated and make async
+                //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    public Bitmap? SelectedPodcastImage
+    {
+        get => _selectedPodcastImage;
+        set
+        {
+            if (_selectedPodcastImage == value)
+            {
+                return;
+            }
+
+            _selectedPodcastImage = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Episode? SelectedEpisode
+    {
+        get => _selectedEpisode;
+        set
+        {
+            if (_selectedEpisode == value)
+            {
+                return;
+            }
+
+            _selectedEpisode = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
+        }
+    }
+
+    public Episode? PlayingEpisode
+    {
+        get => _playingEpisode;
+        set
+        {
+            if (_playingEpisode == value)
+            {
+                return;
+            }
+
+            _playingEpisode = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SearchValue
+    {
+        get => _searchValue;
+        set
+        {
+            if (_searchValue == value)
+            {
+                return;
+            }
+
+            _searchValue = value;
+            PodcastSearch(value).ConfigureAwait(true);
+
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SearchListBoxIndex));
+        }
+    }
+
+    public string Status
+    {
+        get => _status;
+        set
+        {
+            if (_status == value)
+            {
+                return;
+            }
+
+            _status = value;
+            OnPropertyChanged();
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+
+                _status = string.Empty;
+                OnPropertyChanged();
+            });
+        }
+    }
 
     public AvaloniaList<Podcast> Podcasts { get; init; } = [];
     public AvaloniaList<iTunesPodcastFinder.Models.Podcast> SearchPodcasts { get; init; } = [];
@@ -104,25 +234,18 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         get
         {
-            if (_selectedEpisode is null)
+            if (SelectedEpisode is null)
             {
                 return string.Format(_episodeDescriptionHtmlStyledTemplate, string.Empty);
             }
 
-            return string.Format(_episodeDescriptionHtmlStyledTemplate, _selectedEpisode.Description);
+            return string.Format(_episodeDescriptionHtmlStyledTemplate, SelectedEpisode.Description);
         }
-    }
-
-    public MainWindowViewModel()
-    {
-        var podcasts = _podcastService.LoadFromDisk();
-        Podcasts.AddRange(podcasts);
-        _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
     }
 
     private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
     {
-        if (_playingEpisode == null || _selectedPodcast == null || _selectedEpisode == null)
+        if (_playingEpisode == null || _selectedPodcast == null || SelectedEpisode == null)
         {
             return;
         }
@@ -132,7 +255,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
         {
-            var nextIndex = _selectedPodcast.Episodes.IndexOf(_selectedEpisode) - 1;
+            var nextIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) - 1;
             if (nextIndex >= 0)
             {
                 var nextEpisode = _selectedPodcast.Episodes.ElementAt(nextIndex);
@@ -242,13 +365,13 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (_selectedEpisode is null)
+        if (SelectedEpisode is null)
         {
             SelectedEpisode = _selectedPodcast.Episodes.FirstOrDefault();
             return;
         }
 
-        int nextIndex = _selectedPodcast.Episodes.IndexOf(_selectedEpisode) - 1;
+        int nextIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) - 1;
         if (nextIndex >= 0)
         {
             SelectedEpisode = _selectedPodcast.Episodes.ElementAt(nextIndex);
@@ -263,13 +386,13 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (_selectedEpisode is null)
+        if (SelectedEpisode is null)
         {
             SelectedEpisode = _selectedPodcast.Episodes.LastOrDefault();
             return;
         }
 
-        int previousIndex = _selectedPodcast.Episodes.IndexOf(_selectedEpisode) + 1;
+        int previousIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) + 1;
         if (previousIndex < _selectedPodcast.Episodes.Count)
         {
             SelectedEpisode = _selectedPodcast.Episodes.ElementAt(previousIndex);
@@ -368,44 +491,5 @@ public partial class MainWindowViewModel : ViewModelBase
         Podcasts.Remove(podcast);
 
         await _podcastService.SaveToDisk(Podcasts);
-    }
-
-    partial void OnSelectedPodcastChanged(Podcast? podcast)
-    {
-        if (string.IsNullOrEmpty(podcast?.ImageLocalPath))
-        {
-            return;
-        }
-
-        if (!File.Exists(podcast.ImageLocalPath))
-        {
-            return;
-        }
-
-        SelectedPodcastImage = new Bitmap(podcast.ImageLocalPath);
-
-        // Switch once updated and make async
-        //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
-    }
-
-    partial void OnSelectedEpisodeChanged(Episode? value)
-    {
-        OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
-    }
-
-    partial void OnSearchValueChanged(string value)
-    {
-        PodcastSearch(value).ConfigureAwait(true);
-        OnPropertyChanged(nameof(SearchListBoxIndex));
-    }
-
-    partial void OnStatusChanged(string value)
-    {
-        Task.Run(async () =>
-        {
-            await Task.Delay(TimeSpan.FromSeconds(5));
-
-            Status = string.Empty;
-        });
     }
 }
