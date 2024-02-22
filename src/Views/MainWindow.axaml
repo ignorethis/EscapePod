@@ -135,6 +135,14 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Episode}">
                         <Grid ColumnDefinitions="*,Auto">
+                            <i:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                    <ia:InvokeCommandAction
+                                        Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayEpisodeCommand}"
+                                        CommandParameter="{Binding}" />
+                                </ia:EventTriggerBehavior>
+                            </i:Interaction.Behaviors>
+
                             <ProgressBar
                                 Grid.Column="0"
                                 Background="Transparent"
@@ -145,27 +153,18 @@
                                 VerticalAlignment="Stretch"
                                 ZIndex="-1" />
 
-                            <DockPanel Grid.Column="0">
-                                <i:Interaction.Behaviors>
-                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                        <ia:InvokeCommandAction
-                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayEpisodeCommand}"
-                                            CommandParameter="{Binding}" />
-                                    </ia:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
+                            <TextBlock
+                                Grid.Column="0"
+                                Padding="8"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis" />
 
-                                <Button
-                                    DockPanel.Dock="Right"
-                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayOrPauseEpisodeCommand}"
-                                    CommandParameter="{Binding}"
-                                    Content=">"
-                                    Margin="2" />
-
-                                <TextBlock
-                                    Padding="8"
-                                    Text="{Binding Name}"
-                                    TextTrimming="CharacterEllipsis" />
-                            </DockPanel>
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayOrPauseEpisodeCommand}"
+                                CommandParameter="{Binding}"
+                                Content=">"
+                                Margin="2" />
 
                             <!--zeichen wird grad abgespielt-->
                         </Grid>
