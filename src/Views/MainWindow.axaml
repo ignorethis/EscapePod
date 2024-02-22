@@ -2,6 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:EscapePod.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
+        xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:EscapePod.Models"
         xmlns:iTunes="clr-namespace:iTunesPodcastFinder.Models;assembly=iTunesPodcastFinder"
@@ -40,7 +42,7 @@
             <Button Content="Last" Command="{Binding SelectLastEpisodeCommand}"/>
             <Button Content="First" Command="{Binding SelectFirstEpisodeCommand}"/>
         </StackPanel>
-        <DockPanel Grid.Row="3" >
+        <DockPanel Grid.Row="3">
             <Slider DockPanel.Dock="Right" Width="100" Padding="8,0" Maximum="1.0" TickPlacement="None" TickFrequency="0.10" Value="{Binding Volume}" />
             <Slider Padding="8,0" Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}" TickPlacement="None" TickFrequency="1" Value="{Binding PlayingEpisodeListenProgress}" />
         </DockPanel>
@@ -58,6 +60,13 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type iTunes:Podcast}">
                         <DockPanel HorizontalAlignment="Stretch">
+                            <i:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                    <ia:InvokeCommandAction
+                                        Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).AddPodcastCommand}"
+                                        CommandParameter="{Binding}" />
+                                </ia:EventTriggerBehavior>
+                            </i:Interaction.Behaviors>
                             <Button
                                 DockPanel.Dock="Right"
                                 Content="+"
