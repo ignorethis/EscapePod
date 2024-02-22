@@ -136,14 +136,14 @@
                     <DataTemplate DataType="{x:Type models:Episode}">
                         <Grid ColumnDefinitions="*,Auto">
                             <ProgressBar
+                                Grid.Column="0"
+                                Background="Transparent"
                                 BorderThickness="0"
                                 CornerRadius="0"
-                                Grid.Column="0"
-                                Value="{Binding ListenPercent, Mode=OneWay}"
-                                ZIndex="-1"
-                                VerticalAlignment="Stretch"
                                 Foreground="{StaticResource ThemeForegroundColor}"
-                                Background="Transparent" />
+                                Value="{Binding ListenPercent, Mode=OneWay}"
+                                VerticalAlignment="Stretch"
+                                ZIndex="-1" />
 
                             <DockPanel Grid.Column="0">
                                 <i:Interaction.Behaviors>
