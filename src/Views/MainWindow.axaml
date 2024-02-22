@@ -59,7 +59,7 @@
                 SelectedValue="{Binding SelectedSearchPodcast, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type iTunes:Podcast}">
-                        <DockPanel HorizontalAlignment="Stretch">
+                        <DockPanel>
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
                                     <ia:InvokeCommandAction
@@ -73,7 +73,10 @@
                                 Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).AddPodcastCommand}"
                                 CommandParameter="{Binding}"
                                 Margin="2" />
-                            <TextBlock Padding="8,0" Text="{Binding Name}" VerticalAlignment="Center" />
+                            <TextBlock
+                                Padding="8"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis" />
                         </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -82,24 +85,21 @@
                 Grid.Column="0"
                 ItemsSource="{Binding Podcasts}"
                 SelectedItem="{Binding SelectedPodcast}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                HorizontalAlignment="Stretch">
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Podcast}">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock
-                                Grid.Column="0"
-                                Text="{Binding Name}"
-                                TextTrimming="CharacterEllipsis"
-                                VerticalAlignment="Center"
-                                Padding="8,0" />
+                        <DockPanel>
                             <Button
-                                Grid.Column="1"
+                                DockPanel.Dock="Right"
                                 Content="-"
                                 Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).DeletePodcastCommand}"
                                 CommandParameter="{Binding}"
                                 Margin="2" />
-                        </Grid>
+                            <TextBlock
+                                Padding="8"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis" />
+                        </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -107,7 +107,6 @@
                 ItemsSource="{Binding SelectedPodcast.Episodes}"
                 SelectedItem="{Binding SelectedEpisode}"
                 AutoScrollToSelectedItem="True"
-                HorizontalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListBox.ItemTemplate>
@@ -130,7 +129,10 @@
                                     Content=">"
                                     Margin="2">
                                 </Button>
-                                <TextBlock Padding="8,0" Text="{Binding Name}" VerticalAlignment="Center" />
+                                <TextBlock
+                                    Padding="8"
+                                    Text="{Binding Name}"
+                                    TextTrimming="CharacterEllipsis" />
                             </DockPanel>
                             <!--zeichen wird grad abgespielt-->
                         </Grid>
