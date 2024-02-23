@@ -212,7 +212,7 @@ public sealed class PodcastService
             IsExplicit = explicitValue != null && explicitValue == "yes" ? true : false,
             Language = languageValue,
             Copyright = copyrightValue,
-            LastUpdate = lastBuildDateValue == null ? null : DateTime.Parse(lastBuildDateValue),
+            LastUpdate = lastBuildDateValue is null ? null : DateTime.Parse(lastBuildDateValue),
             Id = outerPodcast.ItunesId,
             PodcastLocalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
         };

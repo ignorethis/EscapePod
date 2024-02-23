@@ -202,9 +202,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private async void EpisodeIsPlayingTimer_Elapsed(object sender, ElapsedEventArgs e)
+    private async void EpisodeIsPlayingTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
-        if (_playingEpisode == null || _selectedPodcast == null || SelectedEpisode == null)
+        if (_playingEpisode is null || _selectedPodcast is null || _selectedEpisode is null || _audioFileReader is null)
         {
             return;
         }
@@ -382,13 +382,13 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         //alten zustand wiederherstellen
-        SelectedPodcast = oldSelectedPodcastUri == null
+        SelectedPodcast = oldSelectedPodcastUri is null
             ? null
             : Podcasts.FirstOrDefault(p => p.PodcastUri == oldSelectedPodcastUri);
 
         if (_selectedPodcast is not null)
         {
-            SelectedEpisode = oldSelectedEpisodeUri == null
+            SelectedEpisode = oldSelectedEpisodeUri is null
                 ? null
                 : _selectedPodcast.Episodes.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
         }
