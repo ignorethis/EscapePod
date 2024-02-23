@@ -215,7 +215,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
         {
-            var nextIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) - 1;
+            var nextIndex = _selectedPodcast.Episodes.IndexOf(_selectedEpisode) - 1;
             if (nextIndex >= 0)
             {
                 var nextEpisode = _selectedPodcast.Episodes.ElementAt(nextIndex);
@@ -261,7 +261,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public async Task PauseEpisode()
     {
-        if (_playingEpisode is null)
+        if (_playingEpisode is null || _audioFileReader is null)
         {
             return;
         }
@@ -279,8 +279,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public async Task PlayEpisode(Episode episode)
     {
-        if (episode == PlayingEpisode
-            && _audioPlayer.PlaybackState == PlaybackState.Playing)
+        if (episode == _playingEpisode && _audioPlayer.PlaybackState == PlaybackState.Playing)
+        {
+            return;
+        }
+
+        if (_selectedPodcast is null)
         {
             return;
         }
@@ -370,6 +374,11 @@ public partial class MainWindowViewModel : ViewModelBase
         List<Podcast> updatedPodcasts = [];
         foreach (Podcast podcast in Podcasts)
         {
+            if (podcast.PodcastUri is null)
+            {
+                continue;
+            }
+
             Podcast updatedPodcast = await _podcastService.GetPodcast(podcast.PodcastUri);
             updatedPodcasts.Add(updatedPodcast);
         }

@@ -111,15 +111,13 @@ public sealed class PodcastService
 
         var fileFullName = GetFileFullName(path, name, extension);
         var directoryName = Path.GetDirectoryName(fileFullName);
-        if (!Directory.Exists(directoryName))
+        if (directoryName is not null && !Directory.Exists(directoryName))
         {
             Directory.CreateDirectory(directoryName);
         }
 
-        using (var fileStream = new FileStream(fileFullName, FileMode.Create, FileAccess.Write))
-        {
-            await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
-        }
+        await using var fileStream = new FileStream(fileFullName, FileMode.Create, FileAccess.Write);
+        await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
 
         return fileFullName;
     }
@@ -163,7 +161,7 @@ public sealed class PodcastService
 
         string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
 
-        return JsonConvert.DeserializeObject<List<Podcast>>(fileContent);
+        return JsonConvert.DeserializeObject<List<Podcast>>(fileContent) ?? [];
     }
 
     public Podcast PodcastConversion(
@@ -174,7 +172,7 @@ public sealed class PodcastService
 
         foreach (var episode in podcastEpisodes)
         {
-            result.Episodes.Add(GetEpisodeFrom(result, episode));
+            result.Episodes.Add(GetEpisodeFrom(episode));
         }
 
         return result;
@@ -196,9 +194,9 @@ public sealed class PodcastService
         var copyrightValue = xml.Descendants("copyright").FirstOrDefault()?.Value;
         var lastBuildDateValue = xml.Descendants("lastBuildDate").FirstOrDefault()?.Value;
 
-        var validUri = Uri.TryCreate(outerPodcast.FeedUrl, UriKind.RelativeOrAbsolute, out Uri uri);
-        var validTitleCard = Uri.TryCreate(outerPodcast.ArtWork, UriKind.RelativeOrAbsolute, out Uri titleCardUri);
-        var validWebsite = Uri.TryCreate(outerPodcast.ItunesLink, UriKind.RelativeOrAbsolute, out Uri websiteUri);
+        var validUri = Uri.TryCreate(outerPodcast.FeedUrl, UriKind.RelativeOrAbsolute, out Uri? uri);
+        var validTitleCard = Uri.TryCreate(outerPodcast.ArtWork, UriKind.RelativeOrAbsolute, out Uri? titleCardUri);
+        var validWebsite = Uri.TryCreate(outerPodcast.ItunesLink, UriKind.RelativeOrAbsolute, out Uri? websiteUri);
 
         return new Podcast()
         {
@@ -206,19 +204,19 @@ public sealed class PodcastService
             PodcastUri = validUri ? uri : null,
             ImageUri = validTitleCard ? titleCardUri : null,
             Author = outerPodcast.Editor,
-            Subtitle = descriptionValue,
+            Subtitle = descriptionValue ?? string.Empty,
             Description = outerPodcast.Summary,
             WebsiteUri = validWebsite ? websiteUri : null,
-            IsExplicit = explicitValue != null && explicitValue == "yes" ? true : false,
-            Language = languageValue,
-            Copyright = copyrightValue,
+            IsExplicit = explicitValue is "yes",
+            Language = languageValue ?? string.Empty,
+            Copyright = copyrightValue ?? string.Empty,
             LastUpdate = lastBuildDateValue is null ? null : DateTime.Parse(lastBuildDateValue),
             Id = outerPodcast.ItunesId,
             PodcastLocalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
         };
     }
 
-    private Episode GetEpisodeFrom(Podcast podcast, iTunesPodcastFinder.Models.PodcastEpisode episode)
+    private Episode GetEpisodeFrom(iTunesPodcastFinder.Models.PodcastEpisode episode)
     {
         var xml = XDocument.Parse("<episode>" + episode.InnerXml + "</episode>");
         var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
@@ -234,7 +232,7 @@ public sealed class PodcastService
             Description = episode.Summary,
             IsExplicit = explicitValue is "yes",
             Length = TimeSpan.Zero,
-            MimeType = audioFileTypeValue,
+            MimeType = audioFileTypeValue ?? string.Empty,
             Name = episode.Title,
             PublishDate = episode.PublishedDate,
             Subtitle = episode.Title,
