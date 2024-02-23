@@ -211,6 +211,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         _playingEpisode.ListenStoppedAt = _audioFileReader.CurrentTime;
         _playingEpisode.ListenLastAt = e.SignalTime;
+        OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
 
         if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
         {
