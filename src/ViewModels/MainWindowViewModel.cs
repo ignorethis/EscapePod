@@ -183,7 +183,6 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     public bool IsPlaying => _audioPlayer.PlaybackState == PlaybackState.Playing;
-    public string PlayOrPauseButtonContent => IsPlaying ? "II" : ">";
     public bool IsSearching => !string.IsNullOrEmpty(SearchValue);
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
 
@@ -289,7 +288,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _playingEpisode.ListenStoppedAt = TimeSpan.FromSeconds(_audioFileReader.CurrentTime.TotalSeconds);
         _playingEpisode.ListenLastAt = DateTime.Now;
 
-        OnPropertyChanged(nameof(PlayOrPauseButtonContent));
+        OnPropertyChanged(nameof(IsPlaying));
 
         await _podcastService.SaveToDisk(Podcasts);
     }
@@ -334,7 +333,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         episode.Length = _audioFileReader.TotalTime;
 
-        OnPropertyChanged(nameof(PlayOrPauseButtonContent));
+        OnPropertyChanged(nameof(IsPlaying));
         OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
         OnPropertyChanged(nameof(PlayingEpisodeListenProgressMax));
     }

@@ -135,20 +135,39 @@
                 <StackPanel.Styles>
                     <Style Selector="Button">
                         <Setter Property="Width" Value="30" />
+                        <Setter Property="Height" Value="30" />
                     </Style>
                 </StackPanel.Styles>
 
+                <Button Command="{Binding SelectFirstEpisodeCommand}">
+                    <Svg Path="/Assets/first.svg" />
+                </Button>
+
+                <Button Command="{Binding PreviousEpisodeCommand}">
+                    <Svg Path="/Assets/backward.svg" />
+                </Button>
+                
                 <Button
                     Command="{Binding PlayOrPauseEpisodeCommand}"
                     CommandParameter="{Binding SelectedEpisode}">
-                    <Svg Path="/Assets/play.svg" />
+                    <Panel>
+                        <Svg Path="/Assets/pause.svg" IsVisible="{Binding IsPlaying}" />
+                        <Svg Path="/Assets/play.svg" IsVisible="{Binding !IsPlaying}" />
+                    </Panel>
                 </Button>
-                <Button Command="{Binding NextEpisodeCommand}" Content=">>" />
-                <Button Command="{Binding PreviousEpisodeCommand}" Content="&lt;&lt;" />
-                <Button Command="{Binding UpdateAllPodcastsCommand}" Content="@" />
-                <Button Command="{Binding SelectLastEpisodeCommand}" Content="L"/>
-                <Button Command="{Binding SelectFirstEpisodeCommand}" Content="F"/>
+                
+                <Button Command="{Binding NextEpisodeCommand}">
+                    <Svg Path="/Assets/forward.svg" />
+                </Button>
 
+                <Button Command="{Binding SelectLastEpisodeCommand}">
+                    <Svg Path="/Assets/last.svg" />
+                </Button>
+                
+                <Button Command="{Binding UpdateAllPodcastsCommand}" Margin="10,0,0,0">
+                    <Svg Path="/Assets/update.svg" />
+                </Button>                
+                
                 <Image Source="{Binding PlayingPodcastImage}" Height="30" Width="30" Margin="10,0,0,0"/>
             </StackPanel>
 
