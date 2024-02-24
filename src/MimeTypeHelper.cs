@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace EscapePod;
+﻿namespace EscapePod;
 
 public static class MimeTypeHelper
 {
@@ -15,7 +13,7 @@ public static class MimeTypeHelper
             "audio/x-pn-realaudio" => "ra",
             "audio/x-ms-wma" => "wma",
             "audio/midi" => "mid",
-            _ => throw new SwitchExpressionException(mimeType)
+            _ => "mp3"
         };
     }
 }

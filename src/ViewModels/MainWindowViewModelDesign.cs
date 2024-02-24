@@ -7,8 +7,24 @@ namespace EscapePod.ViewModels
     {
         public MainWindowViewModelDesign()
         {
+            Podcast podcast1 = new()
+            {
+                Author = "Podcast_Author",
+                Copyright = "Podcast_Copyright",
+                Description = "Podcast_Description",
+                Episodes = [],
+                Id = "Podcast_Id",
+                ImageUri = new Uri("https://upload.wikimedia.org/wikipedia/commons/1/11/Test-Logo.svg"),
+                IsExplicit = true,
+                Name = "Podcast_Name",
+                Language = "Podcast_Language",
+                LastUpdate = DateTime.Now.AddDays(-5),
+                Subtitle = "Podcast_Subtitle"
+            };
+
             Episode episode1 = new()
             {
+                Podcast = podcast1,
                 Author = "Episode1_Author",
                 Description = "Episode1_Description",
                 IsExplicit = false,
@@ -29,6 +45,7 @@ namespace EscapePod.ViewModels
 
             Episode episode2 = new()
             {
+                Podcast = podcast1,
                 Author = "Episode2_Author",
                 Description = "Episode2_Description",
                 IsExplicit = false,
@@ -49,6 +66,7 @@ namespace EscapePod.ViewModels
 
             Episode episode3 = new()
             {
+                Podcast = podcast1,
                 Author = "Episode3_Author",
                 Description = "Episode3_Description",
                 IsExplicit = false,
@@ -67,21 +85,8 @@ namespace EscapePod.ViewModels
                 ListenStoppedAt = TimeSpan.FromSeconds(60),
             };
 
-            Podcast podcast1 = new()
-            {
-                Author = "Podcast_Author",
-                Copyright = "Podcast_Copyright",
-                Description = "Podcast_Description",
-                Episodes = [episode1, episode2, episode3],
-                Id = "Podcast_Id",
-                ImageUri = new Uri("https://upload.wikimedia.org/wikipedia/commons/1/11/Test-Logo.svg"),
-                IsExplicit = true,
-                Name = "Podcast_Name",
-                Language = "Podcast_Language",
-                LastUpdate = DateTime.Now.AddDays(-5),
-                Subtitle = "Podcast_Subtitle"
-            };
 
+            podcast1.Episodes.AddRange([episode1, episode2, episode3]);
             Podcasts.Add(podcast1);
         }
     }

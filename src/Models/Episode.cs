@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace EscapePod.Models;
 
 public sealed class Episode : ObservableObject
 {
+    [JsonIgnore]
+    public Podcast Podcast { get; set; }
+
     public string Author { get; init; }
     public string Description { get; init; }
     public bool IsExplicit { get; init; }

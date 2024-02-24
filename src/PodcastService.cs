@@ -161,21 +161,29 @@ public sealed class PodcastService
 
         string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
 
-        return JsonConvert.DeserializeObject<List<Podcast>>(fileContent) ?? [];
+        var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent) ?? [];
+        foreach ( var podcast in podcasts)
+        {
+            foreach (var episode in podcast.Episodes)
+            {
+                episode.Podcast = podcast;
+            }
+        }
+        return podcasts;
     }
 
     public Podcast PodcastConversion(
         iTunesPodcastFinder.Models.Podcast outerPodcast,
         IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
     {
-        var result = GetPodcastFrom(outerPodcast);
+        var podcast = GetPodcastFrom(outerPodcast);
 
         foreach (var episode in podcastEpisodes)
         {
-            result.Episodes.Add(GetEpisodeFrom(episode));
+            podcast.Episodes.Add(GetEpisodeFrom(podcast, episode));
         }
 
-        return result;
+        return podcast;
     }
 
     private Podcast GetPodcastFrom(iTunesPodcastFinder.Models.Podcast outerPodcast)
@@ -216,7 +224,7 @@ public sealed class PodcastService
         };
     }
 
-    private Episode GetEpisodeFrom(iTunesPodcastFinder.Models.PodcastEpisode episode)
+    private Episode GetEpisodeFrom(Podcast podcast, iTunesPodcastFinder.Models.PodcastEpisode episode)
     {
         var xml = XDocument.Parse("<episode>" + episode.InnerXml + "</episode>");
         var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";
@@ -228,6 +236,7 @@ public sealed class PodcastService
 
         return new Episode
         {
+            Podcast = podcast,
             Author = episode.Editor,
             Description = episode.Summary,
             IsExplicit = explicitValue is "yes",

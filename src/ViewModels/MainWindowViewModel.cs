@@ -27,6 +27,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private Podcast? _selectedPodcast;
     private Bitmap? _selectedPodcastImage;
     private Episode? _selectedEpisode;
+    private Bitmap? _playingPodcastImage;
     private Episode? _playingEpisode;
     private string _searchValue = string.Empty;
     private string _status = string.Empty;
@@ -83,10 +84,27 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    public Bitmap? PlayingPodcastImage
+    {
+        get => _playingPodcastImage;
+        set => SetProperty(ref _playingPodcastImage, value);
+    }
+
     public Episode? PlayingEpisode
     {
         get => _playingEpisode;
-        set => SetProperty(ref _playingEpisode, value);
+        set
+        {
+            if (!SetProperty(ref _playingEpisode, value))
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(_playingEpisode?.Podcast?.ImageLocalPath) && File.Exists(_playingEpisode.Podcast.ImageLocalPath))
+            {
+                PlayingPodcastImage = new Bitmap(_playingEpisode.Podcast.ImageLocalPath);
+            }
+        }
     }
 
     public string SearchValue
@@ -165,7 +183,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     public bool IsPlaying => _audioPlayer.PlaybackState == PlaybackState.Playing;
-    public string PlayOrPauseButtonContent => IsPlaying ? "Pause" : "Play";
+    public string PlayOrPauseButtonContent => IsPlaying ? "II" : ">";
     public bool IsSearching => !string.IsNullOrEmpty(SearchValue);
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
 
