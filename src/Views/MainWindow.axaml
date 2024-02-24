@@ -140,8 +140,9 @@
 
                 <Button
                     Command="{Binding PlayOrPauseEpisodeCommand}"
-                    CommandParameter="{Binding SelectedEpisode}"
-                    Content="{Binding PlayOrPauseButtonContent}" />
+                    CommandParameter="{Binding SelectedEpisode}">
+                    <Svg Path="/Assets/play.svg" />
+                </Button>
                 <Button Command="{Binding NextEpisodeCommand}" Content=">>" />
                 <Button Command="{Binding PreviousEpisodeCommand}" Content="&lt;&lt;" />
                 <Button Command="{Binding UpdateAllPodcastsCommand}" Content="@" />
