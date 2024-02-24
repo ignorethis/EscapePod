@@ -21,54 +21,13 @@
         <vm:MainWindowViewModelDesign />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto, Auto">
-        <Grid Grid.Row="0" Grid.Column="0" Height="200" ColumnDefinitions="Auto,*">
-            <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />
-            <WebView Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
-        </Grid>
-
-        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
-            <StackPanel.Styles>
-                <Style Selector="Button">
-                    <Setter Property="Width" Value="100" />
-                </Style>
-            </StackPanel.Styles>
-
-            <Button
-                Command="{Binding PlayOrPauseEpisodeCommand}"
-                CommandParameter="{Binding SelectedEpisode}"
-                Content="{Binding PlayOrPauseButtonContent}" />
-            <Button Command="{Binding NextEpisodeCommand}" Content="Next" />
-            <Button Command="{Binding PreviousEpisodeCommand}" Content="Previous" />
-            <Button Command="{Binding UpdateAllPodcastsCommand}" Content="Update" />
-            <Button Command="{Binding SelectLastEpisodeCommand}" Content="Last"/>
-            <Button Command="{Binding SelectFirstEpisodeCommand}" Content="First"/>
-        </StackPanel>
-
-        <DockPanel Grid.Row="3">
-            <Slider
-                DockPanel.Dock="Right"
-                Maximum="1.0"
-                Padding="8,0"
-                TickFrequency="0.10"
-                TickPlacement="None"
-                Value="{Binding Volume}"
-                Width="100" />
-
-            <Slider
-                Padding="8,0"
-                Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}"
-                TickPlacement="None"
-                TickFrequency="1"
-                Value="{Binding PlayingEpisodeListenProgress}" />
-        </DockPanel>
-
+    <Grid RowDefinitions="Auto, *, Auto, Auto, Auto, Auto">
         <TextBox
-            Grid.Row="4"
+            Grid.Row="0"
             Text="{Binding SearchValue}"
             Watermark="Search for podcasts" />
 
-        <Grid Grid.Row="5" Grid.Column="0" ColumnDefinitions="*,*">
+        <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,*">
             <ListBox
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
@@ -91,7 +50,8 @@
                                 Background="Transparent"
                                 Padding="8"
                                 Text="{Binding Name}"
-                                TextTrimming="CharacterEllipsis"> <!-- background color important for a full hitbox -->
+                                TextTrimming="CharacterEllipsis">
+                                <!-- background color important for a full hitbox -->
                             </TextBlock>
 
                             <Button
@@ -163,7 +123,8 @@
                                 Background="Transparent"
                                 Padding="8"
                                 Text="{Binding Name}"
-                                TextTrimming="CharacterEllipsis"> <!-- background color important for a full hitbox -->
+                                TextTrimming="CharacterEllipsis">
+                                <!-- background color important for a full hitbox -->
                             </TextBlock>
 
                             <Button
@@ -180,8 +141,49 @@
             </ListBox>
         </Grid>
 
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+            <StackPanel.Styles>
+                <Style Selector="Button">
+                    <Setter Property="Width" Value="100" />
+                </Style>
+            </StackPanel.Styles>
+
+            <Button
+                Command="{Binding PlayOrPauseEpisodeCommand}"
+                CommandParameter="{Binding SelectedEpisode}"
+                Content="{Binding PlayOrPauseButtonContent}" />
+            <Button Command="{Binding NextEpisodeCommand}" Content="Next" />
+            <Button Command="{Binding PreviousEpisodeCommand}" Content="Previous" />
+            <Button Command="{Binding UpdateAllPodcastsCommand}" Content="Update" />
+            <Button Command="{Binding SelectLastEpisodeCommand}" Content="Last"/>
+            <Button Command="{Binding SelectFirstEpisodeCommand}" Content="First"/>
+        </StackPanel>
+
+        <DockPanel Grid.Row="3">
+            <Slider
+                DockPanel.Dock="Right"
+                Maximum="1.0"
+                Padding="8,0"
+                TickFrequency="0.10"
+                TickPlacement="None"
+                Value="{Binding Volume}"
+                Width="100" />
+
+            <Slider
+                Padding="8,0"
+                Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}"
+                TickPlacement="None"
+                TickFrequency="1"
+                Value="{Binding PlayingEpisodeListenProgress}" />
+        </DockPanel>      
+      
+        <Grid Grid.Row="4" Grid.Column="0" Height="200" ColumnDefinitions="Auto,*">
+            <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />
+            <WebView Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
+        </Grid>
+
         <TextBlock
-            Grid.Row="6"
+            Grid.Row="5"
             Grid.Column="0"
             Padding="5"
             Text="{Binding Path=Status}" />
