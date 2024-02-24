@@ -222,7 +222,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async void EpisodeIsPlayingTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
-        if (_playingEpisode is null || _selectedPodcast is null || _selectedEpisode is null || _audioFileReader is null)
+        if (_playingEpisode is null || _audioFileReader is null)
         {
             return;
         }
@@ -233,14 +233,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
         {
-            var nextIndex = _selectedPodcast.Episodes.IndexOf(_selectedEpisode) - 1;
+            var nextIndex = _playingEpisode.Podcast.Episodes.IndexOf(_playingEpisode) - 1;
             if (nextIndex >= 0)
             {
-                var nextEpisode = _selectedPodcast.Episodes.ElementAt(nextIndex);
+                var nextEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
                 if (nextEpisode.DownloadState != DownloadState.IsDownloading)
                 {
                     Status = _downloadingEpisodeMessage;
-                    var success = await _podcastService.DownloadEpisode(_selectedPodcast, nextEpisode);
+                    var success = await _podcastService.DownloadEpisode(nextEpisode);
                     if (success)
                     {
                         nextEpisode.DownloadState = DownloadState.Downloaded;
@@ -297,12 +297,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public async Task PlayEpisode(Episode episode)
     {
-        if (episode == _playingEpisode && _audioPlayer.PlaybackState == PlaybackState.Playing)
+        if (episode is null)
         {
             return;
         }
 
-        if (_selectedPodcast is null)
+        if (episode == _playingEpisode && _audioPlayer.PlaybackState == PlaybackState.Playing)
         {
             return;
         }
@@ -310,7 +310,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!File.Exists(episode.EpisodeLocalPath))
         {
             Status = _downloadingEpisodeMessage;
-            var success = await _podcastService.DownloadEpisode(_selectedPodcast, episode);
+            var success = await _podcastService.DownloadEpisode(episode);
             if (!success)
             {
                 Status = _couldNotDownloadEpisodeError;
@@ -342,42 +342,42 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void NextEpisode()
     {
-        if (_selectedPodcast is null)
+        if (_playingEpisode is null)
         {
             return;
         }
 
         if (SelectedEpisode is null)
         {
-            SelectedEpisode = _selectedPodcast.Episodes.FirstOrDefault();
+            SelectedEpisode = _playingEpisode.Podcast.Episodes.FirstOrDefault();
             return;
         }
 
-        int nextIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) - 1;
+        int nextIndex = _playingEpisode.Podcast.Episodes.IndexOf(SelectedEpisode) - 1;
         if (nextIndex >= 0)
         {
-            SelectedEpisode = _selectedPodcast.Episodes.ElementAt(nextIndex);
+            SelectedEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
         }
     }
 
     [RelayCommand]
     public void PreviousEpisode()
     {
-        if (_selectedPodcast is null)
+        if (_playingEpisode is null)
         {
             return;
         }
 
         if (SelectedEpisode is null)
         {
-            SelectedEpisode = _selectedPodcast.Episodes.LastOrDefault();
+            SelectedEpisode = _playingEpisode.Podcast.Episodes.LastOrDefault();
             return;
         }
 
-        int previousIndex = _selectedPodcast.Episodes.IndexOf(SelectedEpisode) + 1;
-        if (previousIndex < _selectedPodcast.Episodes.Count)
+        int previousIndex = _playingEpisode.Podcast.Episodes.IndexOf(SelectedEpisode) + 1;
+        if (previousIndex < _playingEpisode.Podcast.Episodes.Count)
         {
-            SelectedEpisode = _selectedPodcast.Episodes.ElementAt(previousIndex);
+            SelectedEpisode = _playingEpisode.Podcast.Episodes.ElementAt(previousIndex);
         }
     }
 
@@ -426,23 +426,23 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SelectFirstEpisode()
     {
-        if (_selectedPodcast is null)
+        if (_playingEpisode is null)
         {
             return;
         }
 
-        SelectedEpisode = _selectedPodcast.Episodes.LastOrDefault();
+        SelectedEpisode = _playingEpisode.Podcast.Episodes.LastOrDefault();
     }
 
     [RelayCommand]
     public void SelectLastEpisode()
     {
-        if (_selectedPodcast is null)
+        if (_playingEpisode is null)
         {
             return;
         }
 
-        SelectedEpisode = _selectedPodcast.Episodes.FirstOrDefault();
+        SelectedEpisode = _playingEpisode.Podcast.Episodes.FirstOrDefault();
     }
 
     [RelayCommand]

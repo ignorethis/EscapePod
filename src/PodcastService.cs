@@ -44,7 +44,7 @@ public sealed class PodcastService
         return PodcastConversion(podcastWithEpisodes.Podcast, podcastWithEpisodes.Episodes);
     }
 
-    public async Task<bool> DownloadEpisode(Podcast podcast, Episode episode)
+    public async Task<bool> DownloadEpisode(Episode episode)
     {
         if (File.Exists(episode.EpisodeLocalPath) && episode.DownloadState == DownloadState.Downloaded)
         {
@@ -55,7 +55,7 @@ public sealed class PodcastService
 
         var fileFullName = await DownloadFile(
                 episode.EpisodeUri,
-                podcast.PodcastLocalPath,
+                episode.Podcast.PodcastLocalPath,
                 episode.Name,
                 extension)
             .ConfigureAwait(false);
@@ -93,7 +93,7 @@ public sealed class PodcastService
                 new ParallelOptions() { MaxDegreeOfParallelism = 10 },
                 async (episode, _) =>
                 {
-                    await DownloadEpisode(podcast, episode);
+                    await DownloadEpisode(episode);
                 });
         });
     }
