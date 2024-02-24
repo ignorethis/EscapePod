@@ -138,7 +138,10 @@ public sealed class PodcastService
     {
         EnsureContentDirectoryExists();
 
-        string json = JsonConvert.SerializeObject(podcasts);
+        string json = JsonConvert.SerializeObject(podcasts, new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        });
         await File.WriteAllTextAsync(_savefilePath, json);
     }
 
