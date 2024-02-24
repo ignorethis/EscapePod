@@ -99,7 +99,7 @@
                 SelectedItem="{Binding SelectedEpisode}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Episode}">
-                        <Grid ColumnDefinitions="*,Auto">
+                        <Panel>
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
                                     <ia:InvokeCommandAction
@@ -109,7 +109,6 @@
                             </i:Interaction.Behaviors>
 
                             <ProgressBar
-                                Grid.Column="0"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 CornerRadius="0"
@@ -119,23 +118,13 @@
                                 ZIndex="-1" />
 
                             <TextBlock
-                                Grid.Column="0"
                                 Background="Transparent"
                                 Padding="8"
                                 Text="{Binding Name}"
                                 TextTrimming="CharacterEllipsis">
                                 <!-- background color important for a full hitbox -->
                             </TextBlock>
-
-                            <Button
-                                Grid.Column="1"
-                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).PlayOrPauseEpisodeCommand}"
-                                CommandParameter="{Binding}"
-                                Content=">"
-                                Margin="2" />
-
-                            <!--zeichen wird grad abgespielt-->
-                        </Grid>
+                        </Panel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
