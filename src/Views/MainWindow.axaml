@@ -146,7 +146,7 @@
                 <Button Command="{Binding PreviousEpisodeCommand}">
                     <Svg Path="/Assets/backward.svg" />
                 </Button>
-                
+
                 <Button
                     Command="{Binding PlayOrPauseEpisodeCommand}"
                     CommandParameter="{Binding SelectedEpisode}">
@@ -155,7 +155,7 @@
                         <Svg Path="/Assets/play.svg" IsVisible="{Binding !IsPlaying}" />
                     </Panel>
                 </Button>
-                
+
                 <Button Command="{Binding NextEpisodeCommand}">
                     <Svg Path="/Assets/forward.svg" />
                 </Button>
@@ -163,11 +163,11 @@
                 <Button Command="{Binding SelectLastEpisodeCommand}">
                     <Svg Path="/Assets/last.svg" />
                 </Button>
-                
+
                 <Button Command="{Binding UpdateAllPodcastsCommand}" Margin="10,0,0,0">
                     <Svg Path="/Assets/update.svg" />
-                </Button>                
-                
+                </Button>
+
                 <Image Source="{Binding PlayingPodcastImage}" Height="30" Width="30" Margin="10,0,0,0"/>
             </StackPanel>
 
@@ -181,12 +181,12 @@
                 Width="100" />
 
             <Slider
-                Padding="8,0"
                 Maximum="{Binding PlayingEpisodeListenProgressMax.TotalSeconds}"
+                Padding="8,0"
                 TickPlacement="None"
                 TickFrequency="1"
                 Value="{Binding PlayingEpisodeListenProgress}" />
-        </DockPanel>      
+        </DockPanel>
 
         <Grid Grid.Row="3" Grid.Column="0" Height="200" ColumnDefinitions="Auto,*">
             <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />

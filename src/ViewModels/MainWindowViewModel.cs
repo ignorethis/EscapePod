@@ -187,14 +187,23 @@ public partial class MainWindowViewModel : ViewModelBase
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
 
     private readonly string _episodeDescriptionHtmlStyledTemplate = """
+        <!DOCTYPE html>
+
         <html>
         <head>
             <style>
                 body {{
                     background-color: black;
                     color: white;
+                    margin: 0 0.5rem;
+                    padding: 0;
                 }}
-        
+                
+                p {{
+                    margin: 0 0 0.5rem 0;
+                    padding: 0;
+                }}
+
                 a {{
                     color: white;
                 }}
