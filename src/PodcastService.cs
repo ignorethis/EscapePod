@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using EscapePod.Models;
 using iTunesPodcastFinder;
+using iTunesPodcastFinder.Models;
 using Newtonsoft.Json;
+using Podcast = EscapePod.Models.Podcast;
 
 namespace EscapePod;
 
@@ -27,11 +29,13 @@ public sealed class PodcastService
         _httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
     }
 
-    public async Task<IEnumerable<iTunesPodcastFinder.Models.Podcast>> SearchPodcast(string searchValue)
+    public async Task<List<Podcast>> SearchPodcast(string searchValue)
     {
-        return await new PodcastFinder()
+        var podcasts = await new PodcastFinder()
             .SearchPodcastsAsync(searchValue)
             .ConfigureAwait(false);
+
+        return podcasts.Select(p => GetPodcastFrom(p)).ToList();
     }
 
     public async Task<Podcast> GetPodcast(Uri podcastUrl)
@@ -41,7 +45,7 @@ public sealed class PodcastService
         var podcastWithEpisodes = await new PodcastFinder()
             .GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
 
-        return PodcastConversion(podcastWithEpisodes.Podcast, podcastWithEpisodes.Episodes);
+        return PodcastConversion(podcastWithEpisodes);
     }
 
     public async Task<bool> DownloadEpisode(Episode episode)
@@ -165,9 +169,9 @@ public sealed class PodcastService
         string fileContent = File.ReadAllText(Path.Combine(_savefilePath));
 
         var podcasts = JsonConvert.DeserializeObject<List<Podcast>>(fileContent) ?? [];
-        foreach ( var podcast in podcasts)
+        foreach (Podcast podcast in podcasts)
         {
-            foreach (var episode in podcast.Episodes)
+            foreach (Episode episode in podcast.Episodes)
             {
                 episode.Podcast = podcast;
             }
@@ -175,13 +179,11 @@ public sealed class PodcastService
         return podcasts;
     }
 
-    public Podcast PodcastConversion(
-        iTunesPodcastFinder.Models.Podcast outerPodcast,
-        IEnumerable<iTunesPodcastFinder.Models.PodcastEpisode> podcastEpisodes)
+    public Podcast PodcastConversion(PodcastRequestResult podcastRequestResult)
     {
-        var podcast = GetPodcastFrom(outerPodcast);
+        var podcast = GetPodcastFrom(podcastRequestResult.Podcast);
 
-        foreach (var episode in podcastEpisodes)
+        foreach (var episode in podcastRequestResult.Episodes)
         {
             podcast.Episodes.Add(GetEpisodeFrom(podcast, episode));
         }

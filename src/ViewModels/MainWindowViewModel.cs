@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
@@ -23,7 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private AudioFileReader? _audioFileReader;
 
-    private iTunesPodcastFinder.Models.Podcast? _selectedSearchPodcast;
+    private Podcast? _selectedSearchPodcast;
     private Podcast? _selectedPodcast;
     private Bitmap? _selectedPodcastImage;
     private Episode? _selectedEpisode;
@@ -39,7 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
     }
 
-    public iTunesPodcastFinder.Models.Podcast? SelectedSearchPodcast
+    public Podcast? SelectedSearchPodcast
     {
         get => _selectedSearchPodcast;
         set => SetProperty(ref _selectedSearchPodcast, value);
@@ -141,7 +143,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     public AvaloniaList<Podcast> Podcasts { get; init; } = [];
-    public AvaloniaList<iTunesPodcastFinder.Models.Podcast> SearchPodcasts { get; } = [];
+    public AvaloniaList<Podcast> SearchPodcasts { get; } = [];
 
     public float Volume
     {

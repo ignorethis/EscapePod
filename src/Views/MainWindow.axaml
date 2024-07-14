@@ -35,7 +35,7 @@
                 SelectedValue="{Binding SelectedSearchPodcast, Mode=TwoWay}"
                 ZIndex="{Binding SearchListBoxIndex, Mode=OneWay}">
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type iTunes:Podcast}">
+                    <DataTemplate DataType="{x:Type models:Podcast}">
                         <Grid ColumnDefinitions="*,Auto">
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
