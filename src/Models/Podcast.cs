@@ -20,10 +20,7 @@ public sealed class Podcast : ObservableObject
     public Uri? ImageUri { get; init; }
     public Uri? WebsiteUri { get; init; }
 
-    public string DisplayName 
-    { 
-        get { return Name + " | " + Author; } 
-    }
+    public string DisplayName => Name + " | " + Author;
 
     private string? _imageLocalPath;
     public string? ImageLocalPath
