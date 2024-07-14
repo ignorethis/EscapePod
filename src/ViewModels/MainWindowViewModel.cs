@@ -136,13 +136,17 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
+            OnPropertyChanged(nameof(StatusPanelVisible));
+
             Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(5));
                 SetProperty(ref _status, string.Empty);
+                OnPropertyChanged(nameof(StatusPanelVisible));
             });
         }
     }
+    public bool StatusPanelVisible => !string.IsNullOrEmpty(_status);
 
     public AvaloniaList<Podcast> Podcasts { get; init; } = [];
     public AvaloniaList<Podcast> SearchPodcasts { get; } = [];
