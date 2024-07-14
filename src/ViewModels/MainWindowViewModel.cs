@@ -63,6 +63,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 // Switch once updated and make async
                 //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
             }
+
+            OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
         }
     }
 
@@ -187,6 +189,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsPlaying => _audioPlayer.PlaybackState == PlaybackState.Playing;
     public bool IsSearching => !string.IsNullOrEmpty(SearchValue);
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
+    public bool SelectedPodcastPanelVisible => _selectedPodcast is not null;
 
     private readonly string _episodeDescriptionHtmlStyledTemplate = """
         <!DOCTYPE html>
