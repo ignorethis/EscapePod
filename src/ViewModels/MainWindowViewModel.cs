@@ -463,9 +463,9 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task AddPodcast(iTunesPodcastFinder.Models.Podcast podcast)
+    public async Task AddPodcast(Podcast podcast)
     {
-        var newFeedUri = new Uri(podcast.FeedUrl);
+        var newFeedUri = podcast.PodcastUri;
         var newPodcast = await _podcastService.GetPodcast(newFeedUri).ConfigureAwait(false);
 
         Podcasts.Add(newPodcast);
