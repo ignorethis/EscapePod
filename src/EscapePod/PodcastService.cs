@@ -13,7 +13,7 @@ using Podcast = EscapePod.Models.Podcast;
 
 namespace EscapePod;
 
-public sealed class PodcastService
+public sealed class PodcastService : IPodcastService
 {
     private readonly string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0";
 
@@ -90,7 +90,8 @@ public sealed class PodcastService
 
     public async Task DownloadAllEpisodes(Podcast podcast)
     {
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             var episodesToDownload = podcast.Episodes.OrderByDescending(el => el.PublishDate);
             Parallel.ForEachAsync(
                 episodesToDownload,

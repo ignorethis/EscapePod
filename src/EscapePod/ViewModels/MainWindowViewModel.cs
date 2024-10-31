@@ -19,7 +19,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly string _downloadingEpisodeMessage = "Downloading Episode ...";
     private readonly string _couldNotDownloadEpisodeError = "Could not download the episode.";
 
-    private readonly PodcastService _podcastService = new();
+    private readonly IPodcastService _podcastService;
     private readonly WaveOutEvent _audioPlayer = new();
     private readonly Timer _episodeIsPlayingTimer = new(TimeSpan.FromSeconds(1));
 
@@ -34,8 +34,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _searchValue = string.Empty;
     private string _status = string.Empty;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IPodcastService podcastService)
     {
+        _podcastService = podcastService ?? throw new ArgumentNullException(nameof(podcastService));
+     
         var podcasts = _podcastService.LoadFromDisk();
         Podcasts.AddRange(podcasts);
         _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
