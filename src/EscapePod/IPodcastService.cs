@@ -9,9 +9,9 @@ namespace EscapePod
     public interface IPodcastService
     {
         Task DownloadAllEpisodes(Models.Podcast podcast);
-        Task<bool> DownloadEpisode(Episode episode);
-        Task<string?> DownloadFile(Uri uri, string path, string name, string extension);
-        Task<string?> DownloadImage(Models.Podcast podcast);
+        Task<string?> DownloadEpisode(Episode episode);
+        Task<(string? fileFullName, string? error)> DownloadFile(Uri uri, string path, string name, string extension);
+        Task<(string? fileFullName, string? error)> DownloadImage(Models.Podcast podcast);
         string GetFileFullName(string localPath, string fileName, string extension);
         Task<Models.Podcast> GetPodcast(Uri podcastUrl);
         List<Models.Podcast> LoadFromDisk();

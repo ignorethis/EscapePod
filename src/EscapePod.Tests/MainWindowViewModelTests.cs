@@ -2,7 +2,6 @@
 using EscapePod.ViewModels;
 using FluentAssertions;
 using NSubstitute;
-using System.Reactive.Subjects;
 using Xunit;
 
 namespace EscapePod.Tests

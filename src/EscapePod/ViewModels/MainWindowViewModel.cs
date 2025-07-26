@@ -259,14 +259,14 @@ public partial class MainWindowViewModel : ViewModelBase
                 if (nextEpisode.DownloadState != DownloadState.IsDownloading)
                 {
                     Status = _downloadingEpisodeMessage;
-                    var success = await _podcastService.DownloadEpisode(nextEpisode);
-                    if (success)
+                    var error = await _podcastService.DownloadEpisode(nextEpisode);
+                    if (error is null)
                     {
                         nextEpisode.DownloadState = DownloadState.Downloaded;
                     }
                     else
                     {
-                        Status = _couldNotDownloadEpisodeError;
+                        Status = error;
                     }
                 }
             }
@@ -329,10 +329,10 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!File.Exists(episode.EpisodeLocalPath))
         {
             Status = _downloadingEpisodeMessage;
-            var success = await _podcastService.DownloadEpisode(episode);
-            if (!success)
+            var error = await _podcastService.DownloadEpisode(episode);
+            if (error is not null)
             {
-                Status = _couldNotDownloadEpisodeError;
+                Status = error;
                 return;
             }
         }
@@ -472,7 +472,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Podcasts.Add(newPodcast);
 
-        newPodcast.ImageLocalPath = await _podcastService.DownloadImage(newPodcast);
+        var result = await _podcastService.DownloadImage(newPodcast);
+
+        if (result.error is null)
+        {
+            newPodcast.ImageLocalPath = result.fileFullName;
+        }
+        else
+        {
+            newPodcast.ImageLocalPath = null;
+        }
 
         SearchValue = string.Empty;
 

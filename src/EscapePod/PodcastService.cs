@@ -48,44 +48,42 @@ public sealed class PodcastService : IPodcastService
         return PodcastConversion(podcastWithEpisodes);
     }
 
-    public async Task<bool> DownloadEpisode(Episode episode)
+    public async Task<string?> DownloadEpisode(Episode episode)
     {
         if (File.Exists(episode.EpisodeLocalPath) && episode.DownloadState == DownloadState.Downloaded)
         {
-            return true;
+            return null;
         }
 
         var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
 
-        var fileFullName = await DownloadFile(
+        var result = await DownloadFile(
                 episode.EpisodeUri,
                 episode.Podcast.PodcastLocalPath,
                 episode.Name,
                 extension)
             .ConfigureAwait(false);
 
-        if (fileFullName is null)
+        if (result.error is not null)
         {
-            return false;
+            return result.error;
         }
 
-        episode.EpisodeLocalPath = fileFullName;
+        episode.EpisodeLocalPath = result.fileFullName;
         episode.DownloadState = DownloadState.Downloaded;
 
-        return true;
+        return null;
     }
 
-    public async Task<string?> DownloadImage(Podcast podcast)
+    public async Task<(string? fileFullName, string? error)> DownloadImage(Podcast podcast)
     {
         if (!File.Exists(podcast.ImageLocalPath))
         {
-            // TODO: Http StatusCheck
-
             return await DownloadFile(podcast.ImageUri, podcast.PodcastLocalPath, podcast.Name, podcast.ImageUri.AbsolutePath.Split('.').Last())
                 .ConfigureAwait(false);
         }
 
-        return string.Empty;
+        return (podcast.ImageLocalPath,null);
     }
 
     public async Task DownloadAllEpisodes(Podcast podcast)
@@ -103,18 +101,17 @@ public sealed class PodcastService : IPodcastService
         });
     }
 
-    public async Task<string?> DownloadFile(Uri uri, string path, string name, string extension)
+    public async Task<(string? fileFullName,string? error)> DownloadFile(Uri uri, string directoryPath, string name, string extension)
     {
         var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            // TODO: wir brauchen eine möglichkeit um fehler anzuzeigen.
-            return null;
+            return (null, "Cannot download file!");
         }
 
         var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-        var fileFullName = GetFileFullName(path, name, extension);
+        var fileFullName = GetFileFullName(directoryPath, name, extension);
         var directoryName = Path.GetDirectoryName(fileFullName);
         if (directoryName is not null && !Directory.Exists(directoryName))
         {
@@ -124,7 +121,7 @@ public sealed class PodcastService : IPodcastService
         await using var fileStream = new FileStream(fileFullName, FileMode.Create, FileAccess.Write);
         await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
 
-        return fileFullName;
+        return (fileFullName,null);
     }
 
     public string GetFileFullName(string localPath, string fileName, string extension)
