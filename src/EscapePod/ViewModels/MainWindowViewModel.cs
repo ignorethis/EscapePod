@@ -59,13 +59,40 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
-            if (!string.IsNullOrEmpty(value?.ImageLocalPath) && File.Exists(value.ImageLocalPath))
+            // Switch once updated and make async
+            //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
+
+            if (string.IsNullOrEmpty(value?.ImageLocalPath))
+            {
+                if (value.ImageUri is null)
+                {
+                    SelectedPodcastImage = null;
+                }
+                else
+                {
+                    Task.Run(async () =>
+                    {
+                        var result = await _podcastService.DownloadImage(value);
+                        if (result.error is null)
+                        {
+                            value.ImageLocalPath = result.fileFullName;
+                            await _podcastService.SaveToDisk(Podcasts);
+                            SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
+                            OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
+                        }
+                        else
+                        {
+                            Status = result.error;
+                        }
+                    });
+                }
+            }
+            else 
             {
                 SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
-                // Switch once updated and make async
-                //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
+                OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
             }
-
+            
             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
         }
     }
