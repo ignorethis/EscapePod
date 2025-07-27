@@ -275,9 +275,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public async Task PodcastSearch(string query)
     {
-        var results = await _podcastService.SearchPodcast(query);
-        SearchPodcasts.Clear();
-        SearchPodcasts.AddRange(results.OrderBy(x => x.Name));
+        var result = await _podcastService.SearchPodcast(query);
+        
+        if (result.error is null)
+        {
+            SearchPodcasts.Clear();
+            SearchPodcasts.AddRange(result.podcasts.OrderBy(x => x.Name));
+        }
+        else
+        {
+            Status = result.error;
+        }
     }
 
     [RelayCommand]
@@ -416,8 +424,15 @@ public partial class MainWindowViewModel : ViewModelBase
                 continue;
             }
 
-            Podcast updatedPodcast = await _podcastService.GetPodcast(podcast.PodcastUri);
-            updatedPodcasts.Add(updatedPodcast);
+            var result = await _podcastService.GetPodcast(podcast.PodcastUri);
+            if (result.error is null)
+            {
+                updatedPodcasts.Add(result.podcast);
+            }
+            else
+            {
+                Status = result.error;
+            }
         }
 
         //das alte zerstoeren
@@ -468,24 +483,31 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task AddPodcast(Podcast podcast)
     {
         var newFeedUri = podcast.PodcastUri;
-        var newPodcast = await _podcastService.GetPodcast(newFeedUri).ConfigureAwait(false);
+        var podcastResult = await _podcastService.GetPodcast(newFeedUri).ConfigureAwait(false);
 
-        Podcasts.Add(newPodcast);
-
-        var result = await _podcastService.DownloadImage(newPodcast);
-
-        if (result.error is null)
+        if (podcastResult.error is null)
         {
-            newPodcast.ImageLocalPath = result.fileFullName;
+            var newPodcast = podcastResult.podcast;
+            Podcasts.Add(newPodcast);
+            var imageResult = await _podcastService.DownloadImage(newPodcast);
+
+            if (imageResult.error is null)
+            {
+                newPodcast.ImageLocalPath = imageResult.fileFullName;
+            }
+            else
+            {
+                newPodcast.ImageLocalPath = null;
+            }
+
+            SearchValue = string.Empty;
+
+            await _podcastService.SaveToDisk(Podcasts);
         }
         else
         {
-            newPodcast.ImageLocalPath = null;
-        }
-
-        SearchValue = string.Empty;
-
-        await _podcastService.SaveToDisk(Podcasts);
+            Status = podcastResult.error;
+        }        
     }
 
     [RelayCommand]

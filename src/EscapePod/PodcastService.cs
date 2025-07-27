@@ -29,23 +29,40 @@ public sealed class PodcastService : IPodcastService
         _httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
     }
 
-    public async Task<List<Podcast>> SearchPodcast(string searchValue)
+    public async Task<(List<Podcast>? podcasts, string? error)> SearchPodcast(string searchValue)
     {
-        var podcasts = await new PodcastFinder()
-            .SearchPodcastsAsync(searchValue)
-            .ConfigureAwait(false);
+        try
+        {
+            var podcastFinderPodcasts = await new PodcastFinder()
+                .SearchPodcastsAsync(searchValue)
+                .ConfigureAwait(false);
+            var podcasts = podcastFinderPodcasts.Select(p => GetPodcastFrom(p)).ToList();
 
-        return podcasts.Select(p => GetPodcastFrom(p)).ToList();
+            return (podcasts, null);
+        }
+        catch (Exception e)
+        {
+            return (null, e.Message);
+        }
     }
 
-    public async Task<Podcast> GetPodcast(Uri podcastUrl)
+    public async Task<(Podcast? podcast, string? error)> GetPodcast(Uri podcastUrl)
     {
         PodcastFinder.HttpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
 
-        var podcastWithEpisodes = await new PodcastFinder()
-            .GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
+        try
+        {
+            var podcastWithEpisodes = await new PodcastFinder()
+                .GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
 
-        return PodcastConversion(podcastWithEpisodes);
+            var podcast = PodcastConversion(podcastWithEpisodes);
+
+            return (podcast, null);
+        }
+        catch (Exception e)
+        {
+            return (null, e.Message);
+        }   
     }
 
     public async Task<string?> DownloadEpisode(Episode episode)
