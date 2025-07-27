@@ -6,7 +6,6 @@
         xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:EscapePod.Models"
-        xmlns:iTunes="clr-namespace:iTunesPodcastFinder.Models;assembly=iTunesPodcastFinder"
         mc:Ignorable="d"
         d:DesignWidth="600"
         d:DesignHeight="800"
