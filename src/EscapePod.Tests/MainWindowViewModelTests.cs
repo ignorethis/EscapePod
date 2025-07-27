@@ -1,81 +1,86 @@
 ﻿using EscapePod.Models;
 using EscapePod.ViewModels;
-using FluentAssertions;
 using NSubstitute;
-using Xunit;
+using TUnit.Assertions.AssertConditions.Throws;
 
 namespace EscapePod.Tests
 {
     public class MainWindowViewModelTests
     {
-        [Fact]
-        public void ConstructorTest_podcastServiceNull()
+        [Test]
+        public async Task ConstructorTest_podcastServiceNull()
         {
             Action act = () => new MainWindowViewModel(null);
 
-            act.Should().Throw<ArgumentNullException>().WithParameterName("podcastService");
+            await Assert.That(act).Throws<ArgumentNullException>().WithParameterName("podcastService");
         }
 
-        [Fact]
-        public void ConstructorTest1() 
-        { 
+        [Test]
+        public async Task ConstructorTest1()
+        {
             var podcastService = Substitute.For<IPodcastService>();
-            podcastService.LoadFromDisk().Returns(new List<Models.Podcast>());
+            podcastService.LoadFromDisk().Returns(new List<Podcast>());
 
-            MainWindowViewModel viewModel = new MainWindowViewModel(podcastService);
+            var viewModel = new MainWindowViewModel(podcastService);
 
-            viewModel.Should().NotBeNull();
-            viewModel.SelectedSearchPodcast.Should().BeNull();
-            viewModel.SelectedPodcast.Should().BeNull();
-            viewModel.SelectedPodcastImage.Should().BeNull();
-            viewModel.PlayingPodcastImage.Should().BeNull();
-            viewModel.PlayingEpisode.Should().BeNull();
-            viewModel.SearchValue.Should().BeEmpty();
-            viewModel.Status.Should().BeEmpty();
-            viewModel.StatusPanelVisible.Should().BeFalse();
-            viewModel.Podcasts.Should().BeEmpty();
-            viewModel.SearchPodcasts.Should().BeEmpty();
-            viewModel.Volume.Should().Be(1.0f);
-            viewModel.PlayingEpisodeListenProgress.Should().Be(0.0);
-            viewModel.PlayingEpisodeListenProgressMax.Should().Be(TimeSpan.Zero);
-            viewModel.IsPlaying.Should().BeFalse();
-            viewModel.IsSearching.Should().BeFalse();
-            viewModel.SearchListBoxIndex.Should().Be(0);
-            viewModel.SelectedPodcastPanelVisible.Should().BeFalse();
-            viewModel.EpisodeDescriptionHtmlStyled.Should().NotBeEmpty();
+            using (Assert.Multiple())
+            {
+                await Assert.That(viewModel).IsNotNull();
+                await Assert.That(viewModel.SelectedSearchPodcast).IsNull();
+                await Assert.That(viewModel.SelectedPodcast).IsNull();
+                await Assert.That(viewModel.SelectedPodcastImage).IsNull();
+                await Assert.That(viewModel.PlayingPodcastImage).IsNull();
+                await Assert.That(viewModel.PlayingEpisode).IsNull();
+                await Assert.That(viewModel.SearchValue).IsEmpty();
+                await Assert.That(viewModel.Status).IsEmpty();
+                await Assert.That(viewModel.StatusPanelVisible).IsFalse();
+                await Assert.That(viewModel.Podcasts).IsEmpty();
+                await Assert.That(viewModel.SearchPodcasts).IsEmpty();
+                await Assert.That(viewModel.Volume).IsEqualTo(1.0f);
+                await Assert.That(viewModel.PlayingEpisodeListenProgress).IsEqualTo(0.0);
+                await Assert.That(viewModel.PlayingEpisodeListenProgressMax).IsEqualTo(TimeSpan.Zero);
+                await Assert.That(viewModel.IsPlaying).IsFalse();
+                await Assert.That(viewModel.IsSearching).IsFalse();
+                await Assert.That(viewModel.SearchListBoxIndex).IsEqualTo(0);
+                await Assert.That(viewModel.SelectedPodcastPanelVisible).IsFalse();
+                await Assert.That(viewModel.EpisodeDescriptionHtmlStyled).IsNotEmpty();
+            }
 
             podcastService.Received().LoadFromDisk();
         }
 
-        [Fact]
-        public void ConstructorTest2()
+        [Test]
+        public async Task ConstructorTest2()
         {
             var podcasts = new List<Podcast>() { new Podcast() };
 
             var podcastService = Substitute.For<IPodcastService>();
             podcastService.LoadFromDisk().Returns(podcasts);
 
-            MainWindowViewModel viewModel = new MainWindowViewModel(podcastService);
+            var viewModel = new MainWindowViewModel(podcastService);
 
-            viewModel.Should().NotBeNull();
-            viewModel.SelectedSearchPodcast.Should().BeNull();
-            viewModel.SelectedPodcast.Should().BeNull();
-            viewModel.SelectedPodcastImage.Should().BeNull();
-            viewModel.PlayingPodcastImage.Should().BeNull();
-            viewModel.PlayingEpisode.Should().BeNull();
-            viewModel.SearchValue.Should().BeEmpty();
-            viewModel.Status.Should().BeEmpty();
-            viewModel.StatusPanelVisible.Should().BeFalse();
-            viewModel.Podcasts.Should().Equal(podcasts);
-            viewModel.SearchPodcasts.Should().BeEmpty();
-            viewModel.Volume.Should().Be(1.0f);
-            viewModel.PlayingEpisodeListenProgress.Should().Be(0.0);
-            viewModel.PlayingEpisodeListenProgressMax.Should().Be(TimeSpan.Zero);
-            viewModel.IsPlaying.Should().BeFalse();
-            viewModel.IsSearching.Should().BeFalse();
-            viewModel.SearchListBoxIndex.Should().Be(0);
-            viewModel.SelectedPodcastPanelVisible.Should().BeFalse();
-            viewModel.EpisodeDescriptionHtmlStyled.Should().NotBeEmpty();
+            using (Assert.Multiple())
+            {
+                await Assert.That(viewModel).IsNotNull();
+                await Assert.That(viewModel.SelectedSearchPodcast).IsNull();
+                await Assert.That(viewModel.SelectedPodcast).IsNull();
+                await Assert.That(viewModel.SelectedPodcastImage).IsNull();
+                await Assert.That(viewModel.PlayingPodcastImage).IsNull();
+                await Assert.That(viewModel.PlayingEpisode).IsNull();
+                await Assert.That(viewModel.SearchValue).IsEmpty();
+                await Assert.That(viewModel.Status).IsEmpty();
+                await Assert.That(viewModel.StatusPanelVisible).IsFalse();
+                await Assert.That(viewModel.Podcasts).IsEquivalentTo(podcasts);
+                await Assert.That(viewModel.SearchPodcasts).IsEmpty();
+                await Assert.That(viewModel.Volume).IsEqualTo(1.0f);
+                await Assert.That(viewModel.PlayingEpisodeListenProgress).IsEqualTo(0.0);
+                await Assert.That(viewModel.PlayingEpisodeListenProgressMax).IsEqualTo(TimeSpan.Zero);
+                await Assert.That(viewModel.IsPlaying).IsFalse();
+                await Assert.That(viewModel.IsSearching).IsFalse();
+                await Assert.That(viewModel.SearchListBoxIndex).IsEqualTo(0);
+                await Assert.That(viewModel.SelectedPodcastPanelVisible).IsFalse();
+                await Assert.That(viewModel.EpisodeDescriptionHtmlStyled).IsNotEmpty();
+            }
 
             podcastService.Received().LoadFromDisk();
         }
