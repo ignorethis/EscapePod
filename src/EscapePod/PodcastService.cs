@@ -120,7 +120,9 @@ public sealed class PodcastService : IPodcastService
 
     public async Task<(string? fileFullName,string? error)> DownloadFile(Uri uri, string directoryPath, string name, string extension)
     {
+        _httpClient.Timeout = TimeSpan.FromMinutes(10);
         var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
+        
         if (!response.IsSuccessStatusCode)
         {
             return (null, "Cannot download file!");
