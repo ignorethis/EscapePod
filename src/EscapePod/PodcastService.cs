@@ -15,25 +15,25 @@ namespace EscapePod;
 
 public sealed class PodcastService : IPodcastService
 {
-    private readonly string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0";
-
     private readonly string _contentDirectoryPath;
     private readonly string _savefilePath;
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly PodcastFinder _podcastFinder;
 
-    public PodcastService()
+    public PodcastService(IHttpClientFactory httpClientFactory)
     {
         _contentDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod");
         _savefilePath = Path.Combine(_contentDirectoryPath, "savefile.json");
-        _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
+        _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        _podcastFinder = new PodcastFinder(); // TODO: abstaction einführen und auf DI umstellen.
+        PodcastFinder.HttpClient = _httpClientFactory.CreateClient(HttpClientName.Default);
     }
 
     public async Task<(List<Podcast>? podcasts, string? error)> SearchPodcast(string searchValue)
     {
         try
         {
-            var podcastFinderPodcasts = await new PodcastFinder()
+            var podcastFinderPodcasts = await _podcastFinder
                 .SearchPodcastsAsync(searchValue)
                 .ConfigureAwait(false);
             var podcasts = podcastFinderPodcasts.Select(p => GetPodcastFrom(p)).ToList();
@@ -48,11 +48,9 @@ public sealed class PodcastService : IPodcastService
 
     public async Task<(Podcast? podcast, string? error)> GetPodcast(Uri podcastUrl)
     {
-        PodcastFinder.HttpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
-
         try
         {
-            var podcastWithEpisodes = await new PodcastFinder()
+            var podcastWithEpisodes = await _podcastFinder
                 .GetPodcastEpisodesAsync(podcastUrl.AbsoluteUri);
 
             var podcast = PodcastConversion(podcastWithEpisodes);
@@ -120,8 +118,8 @@ public sealed class PodcastService : IPodcastService
 
     public async Task<(string? fileFullName,string? error)> DownloadFile(Uri uri, string directoryPath, string name, string extension)
     {
-        _httpClient.Timeout = TimeSpan.FromMinutes(10);
-        var response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
+        using var httpClient = _httpClientFactory.CreateClient(HttpClientName.Default);
+        var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
         
         if (!response.IsSuccessStatusCode)
         {
@@ -246,7 +244,7 @@ public sealed class PodcastService : IPodcastService
         };
     }
 
-    private Episode GetEpisodeFrom(Podcast podcast, iTunesPodcastFinder.Models.PodcastEpisode episode)
+    private Episode GetEpisodeFrom(Podcast podcast, PodcastEpisode episode)
     {
         var xml = XDocument.Parse("<episode>" + episode.InnerXml + "</episode>");
         var itunesNs = "http://www.itunes.com/dtds/podcast-1.0.dtd";

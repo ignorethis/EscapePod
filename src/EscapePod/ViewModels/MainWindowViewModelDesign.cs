@@ -5,7 +5,7 @@ namespace EscapePod.ViewModels
 {
     public class MainWindowViewModelDesign : MainWindowViewModel
     {
-        public MainWindowViewModelDesign() : base(new PodcastService())
+        public MainWindowViewModelDesign() : base(new PodcastService(new HttpClientFactoryDesign()))
         {
             Podcast podcast1 = new()
             {

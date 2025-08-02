@@ -5,13 +5,14 @@ using Avalonia.Markup.Xaml;
 using AvaloniaWebView;
 using EscapePod.ViewModels;
 using EscapePod.Views;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace EscapePod;
 
 public class App : Application
 {
-    private PodcastService? _podcastService;
-    private MainWindowViewModel? _mainWindowViewModel;
+    private IHost? _host;
 
     public override void Initialize()
     {
@@ -20,16 +21,16 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        _host = Host.CreateDefaultBuilder()
+            .ConfigureServices(ConfigureServices)
+            .Build();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            _podcastService = new PodcastService();
-            _mainWindowViewModel = new MainWindowViewModel(_podcastService);
+            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
 
             desktop.ShutdownRequested += OnShutdownRequested;
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = _mainWindowViewModel,
-            };
+            desktop.MainWindow = mainWindow;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -41,7 +42,16 @@ public class App : Application
 
         try
         {
-            await _podcastService.SaveToDisk(_mainWindowViewModel.Podcasts);
+            if (_host != null)
+            {
+                var podcastService = _host.Services.GetRequiredService<PodcastService>();
+                var mainWindowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
+
+                await podcastService.SaveToDisk(mainWindowViewModel.Podcasts);
+
+                await _host.StopAsync();
+                _host.Dispose();
+            }
         }
         catch (Exception)
         {
@@ -54,6 +64,20 @@ public class App : Application
                 controlledLifetime.Shutdown();
             }
         }
+    }
+
+    private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
+    {
+        services.AddHttpClient(HttpClientName.Default, c =>
+        {
+            c.DefaultRequestHeaders.Add(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0");
+            c.Timeout = TimeSpan.FromMinutes(10);
+        });
+        services.AddTransient<IPodcastService, PodcastService>();
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<MainWindow>();
     }
 
     public override void RegisterServices()
