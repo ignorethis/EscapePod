@@ -65,13 +65,15 @@ public sealed class PodcastService : IPodcastService
 
     public async Task<string?> DownloadEpisode(Episode episode)
     {
-        if (File.Exists(episode.EpisodeLocalPath) && episode.DownloadState == DownloadState.Downloaded)
+        if (File.Exists(episode.EpisodeLocalPath)
+            && (episode.DownloadState == DownloadState.Downloaded || episode.DownloadState == DownloadState.IsDownloading))
         {
             return null;
         }
 
         var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
 
+        episode.DownloadState = DownloadState.IsDownloading;
         var result = await DownloadFile(
                 episode.EpisodeUri,
                 episode.Podcast.PodcastLocalPath,
@@ -79,15 +81,15 @@ public sealed class PodcastService : IPodcastService
                 extension)
             .ConfigureAwait(false);
 
-        if (result.error is not null)
+        if (result.error is null)
         {
-            return result.error;
+            episode.DownloadState = DownloadState.Downloaded;
+            episode.EpisodeLocalPath = result.fileFullName;
+            return null;
         }
 
-        episode.EpisodeLocalPath = result.fileFullName;
-        episode.DownloadState = DownloadState.Downloaded;
-
-        return null;
+        episode.DownloadState = DownloadState.NotStarted;
+        return result.error;
     }
 
     public async Task<(string? fileFullName, string? error)> DownloadImage(Podcast podcast)

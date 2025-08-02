@@ -288,15 +288,11 @@ public partial class MainWindowViewModel : ViewModelBase
             if (nextIndex >= 0)
             {
                 var nextEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
-                if (nextEpisode.DownloadState != DownloadState.IsDownloading)
+                if (!File.Exists(nextEpisode.EpisodeLocalPath) || nextEpisode.DownloadState != DownloadState.Downloaded)
                 {
                     Status = _downloadingEpisodeMessage;
                     var error = await _podcastService.DownloadEpisode(nextEpisode);
-                    if (error is null)
-                    {
-                        nextEpisode.DownloadState = DownloadState.Downloaded;
-                    }
-                    else
+                    if (error is not null)
                     {
                         Status = error;
                     }
@@ -366,7 +362,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (!File.Exists(episode.EpisodeLocalPath))
+        if (!File.Exists(episode.EpisodeLocalPath) || episode.DownloadState != DownloadState.Downloaded)
         {
             Status = _downloadingEpisodeMessage;
             var error = await _podcastService.DownloadEpisode(episode);
