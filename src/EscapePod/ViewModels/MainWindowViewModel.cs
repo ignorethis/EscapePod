@@ -59,38 +59,45 @@ public partial class MainWindowViewModel : ViewModelBase
 
             // Switch once updated and make async
             //SelectedPodcastImage = Bitmap.DecodeToHeight(File.OpenRead(podcast.ImageLocalPath), 200);
-
-            if (string.IsNullOrEmpty(value?.ImageLocalPath))
+            if (value is null)
             {
-                if (value.ImageUri is null)
+                SelectedPodcastImage = null;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value.ImageLocalPath))
                 {
-                    SelectedPodcastImage = null;
+                    if (value.ImageUri is null)
+                    {
+                        SelectedPodcastImage = null;
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            var result = await _podcastService.DownloadImage(value);
+                            if (result.error is null)
+                            {
+                                value.ImageLocalPath = result.fileFullName;
+                                await _podcastService.SaveToDisk(Podcasts);
+                                SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
+                            }
+                            else
+                            {
+                                Status = result.error;
+                                SelectedPodcastImage = null;
+                            }
+
+                            OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
+                        });
+                    }
                 }
                 else
                 {
-                    Task.Run(async () =>
-                    {
-                        var result = await _podcastService.DownloadImage(value);
-                        if (result.error is null)
-                        {
-                            value.ImageLocalPath = result.fileFullName;
-                            await _podcastService.SaveToDisk(Podcasts);
-                            SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
-                            OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
-                        }
-                        else
-                        {
-                            Status = result.error;
-                        }
-                    });
+                    SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
                 }
             }
-            else 
-            {
-                SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
-                OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
-            }
-            
+
             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
         }
     }
