@@ -27,10 +27,10 @@ public class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+            var mainWindowVm = _host.Services.GetRequiredService<MainWindowViewModel>();
 
             desktop.ShutdownRequested += OnShutdownRequested;
-            desktop.MainWindow = mainWindow;
+            desktop.MainWindow = new MainWindow() { DataContext = mainWindowVm };
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -77,7 +77,6 @@ public class App : Application
         });
         services.AddTransient<IPodcastService, PodcastService>();
         services.AddTransient<MainWindowViewModel>();
-        services.AddTransient<MainWindow>();
     }
 
     public override void RegisterServices()
