@@ -9,7 +9,6 @@ using EscapePod.Models;
 using iTunesPodcastFinder;
 using iTunesPodcastFinder.Models;
 using Newtonsoft.Json;
-using QTKit;
 using Podcast = EscapePod.Models.Podcast;
 
 namespace EscapePod;
@@ -108,19 +107,17 @@ public sealed class PodcastService : IPodcastService
         return Result.Ok(podcast.ImageLocalPath);
     }
 
-    public async Task DownloadAllEpisodes(Podcast podcast)
+    public async Task<Result> DownloadAllEpisodes(Podcast podcast)
     {
-        await Task.Run(() =>
+        var episodesToDownload = podcast.Episodes.OrderByDescending(e => e.PublishDate).Select(async e => await DownloadEpisode(e));
+        var results = await Task.WhenAll(episodesToDownload);
+        var failures = results.Where(r => r.IsFailure).ToList();
+        if (failures.Any())
         {
-            var episodesToDownload = podcast.Episodes.OrderByDescending(el => el.PublishDate);
-            Parallel.ForEachAsync(
-                episodesToDownload,
-                new ParallelOptions() { MaxDegreeOfParallelism = 10 },
-                async (episode, _) =>
-                {
-                    await DownloadEpisode(episode);
-                });
-        });
+            return Result.Fail(failures.First().Error);
+        }
+
+        return Result.Ok();
     }
 
     public async Task<Result<string>> DownloadFile(Uri uri, string directoryPath, string name, string extension)

@@ -8,7 +8,7 @@ namespace EscapePod
 {
     public interface IPodcastService
     {
-        Task DownloadAllEpisodes(Models.Podcast podcast);
+        Task<Result> DownloadAllEpisodes(Models.Podcast podcast);
 
         /// <summary>
         ///     Downloads an Episode and manages Episode state.
