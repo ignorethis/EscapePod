@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
@@ -7,7 +6,7 @@ namespace EscapePod;
 
 [DataContract]
 [StructLayout(LayoutKind.Auto)]
-public readonly struct Result : IEquatable<Result>
+public readonly record struct Result
 {
     [DataMember] private readonly bool _isOk;
     [DataMember] private readonly string? _error;
@@ -52,31 +51,4 @@ public readonly struct Result : IEquatable<Result>
     public bool IsFailure => !_isOk;
 
     public string Error => _isOk ? throw new InvalidOperationException() : _error!;
-
-    public override bool Equals(object? obj)
-    {
-        return obj is Result other && Equals(other);
-    }
-
-    public bool Equals(Result other)
-    {
-        return EqualityComparer<bool>.Default.Equals(_isOk, other._isOk)
-            && EqualityComparer<string>.Default.Equals(_error, other._error);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(_isOk, _error);
-    }
-
-    public override string ToString()
-    {
-        return (_isOk, _error).ToString();
-    }
-
-    public static bool operator ==(Result left, Result right) =>
-        left.Equals(right);
-
-    public static bool operator !=(Result left, Result right) =>
-        !(left == right);
 }
