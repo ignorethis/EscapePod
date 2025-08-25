@@ -9,6 +9,7 @@ using EscapePod.Models;
 using iTunesPodcastFinder;
 using iTunesPodcastFinder.Models;
 using Newtonsoft.Json;
+using QTKit;
 using Podcast = EscapePod.Models.Podcast;
 
 namespace EscapePod;
@@ -29,24 +30,24 @@ public sealed class PodcastService : IPodcastService
         PodcastFinder.HttpClient = _httpClientFactory.CreateClient(HttpClientName.Default);
     }
 
-    public async Task<(List<Podcast>? podcasts, string? error)> SearchPodcast(string searchValue)
+    public async Task<Result<List<Podcast>>> SearchPodcast(string searchValue)
     {
         try
         {
             var podcastFinderPodcasts = await _podcastFinder
                 .SearchPodcastsAsync(searchValue)
                 .ConfigureAwait(false);
-            var podcasts = podcastFinderPodcasts.Select(p => GetPodcastFrom(p)).ToList();
+            var podcasts = podcastFinderPodcasts?.Select(p => GetPodcastFrom(p)).ToList() ?? new List<Podcast>();
 
-            return (podcasts, null);
+            return Result.Ok(podcasts);
         }
         catch (Exception e)
         {
-            return (null, e.Message);
+            return Result<List<Podcast>>.Fail(e.Message);
         }
     }
 
-    public async Task<(Podcast? podcast, string? error)> GetPodcast(Uri podcastUrl)
+    public async Task<Result<Podcast>> GetPodcast(Uri podcastUrl)
     {
         try
         {
@@ -55,20 +56,20 @@ public sealed class PodcastService : IPodcastService
 
             var podcast = PodcastConversion(podcastWithEpisodes);
 
-            return (podcast, null);
+            return Result.Ok(podcast);
         }
         catch (Exception e)
         {
-            return (null, e.Message);
+            return Result<Podcast>.Fail(e.Message);
         }   
     }
 
-    public async Task<string?> DownloadEpisode(Episode episode)
+    public async Task<Result> DownloadEpisode(Episode episode)
     {
         if (File.Exists(episode.EpisodeLocalPath)
             && (episode.DownloadState == DownloadState.Downloaded || episode.DownloadState == DownloadState.IsDownloading))
         {
-            return null;
+            return Result.Ok();
         }
 
         var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
@@ -81,26 +82,30 @@ public sealed class PodcastService : IPodcastService
                 extension)
             .ConfigureAwait(false);
 
-        if (result.error is null)
+        if (result.IsOk)
         {
             episode.DownloadState = DownloadState.Downloaded;
-            episode.EpisodeLocalPath = result.fileFullName;
-            return null;
+            episode.EpisodeLocalPath = result.Value;
+            return Result.Ok();
         }
 
         episode.DownloadState = DownloadState.NotStarted;
-        return result.error;
+        return Result.Fail(result.Error);
     }
 
-    public async Task<(string? fileFullName, string? error)> DownloadImage(Podcast podcast)
+    public async Task<Result<string>> DownloadImage(Podcast podcast)
     {
         if (!File.Exists(podcast.ImageLocalPath))
         {
+            if (podcast.ImageUri is null)
+            {
+                return Result<string>.Fail("Podcast Image Uri is null");
+            }
             return await DownloadFile(podcast.ImageUri, podcast.PodcastLocalPath, podcast.Name, podcast.ImageUri.AbsolutePath.Split('.').Last())
                 .ConfigureAwait(false);
         }
 
-        return (podcast.ImageLocalPath,null);
+        return Result.Ok(podcast.ImageLocalPath);
     }
 
     public async Task DownloadAllEpisodes(Podcast podcast)
@@ -118,14 +123,14 @@ public sealed class PodcastService : IPodcastService
         });
     }
 
-    public async Task<(string? fileFullName,string? error)> DownloadFile(Uri uri, string directoryPath, string name, string extension)
+    public async Task<Result<string>> DownloadFile(Uri uri, string directoryPath, string name, string extension)
     {
         using var httpClient = _httpClientFactory.CreateClient(HttpClientName.Default);
         var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
         
         if (!response.IsSuccessStatusCode)
         {
-            return (null, "Cannot download file!");
+            return Result<string>.Fail("Cannot download file!");
         }
 
         var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -140,7 +145,7 @@ public sealed class PodcastService : IPodcastService
         await using var fileStream = new FileStream(fileFullName, FileMode.Create, FileAccess.Write);
         await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
 
-        return (fileFullName,null);
+        return Result<string>.Ok(fileFullName);
     }
 
     public string GetFileFullName(string localPath, string fileName, string extension)

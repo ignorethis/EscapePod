@@ -76,15 +76,15 @@ public partial class MainWindowViewModel : ViewModelBase
                         Task.Run(async () =>
                         {
                             var result = await _podcastService.DownloadImage(value);
-                            if (result.error is null)
+                            if (result.IsOk)
                             {
-                                value.ImageLocalPath = result.fileFullName;
+                                value.ImageLocalPath = result.Value;
                                 await _podcastService.SaveToDisk(Podcasts);
                                 SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
                             }
                             else
                             {
-                                Status = result.error;
+                                Status = result.Error;
                                 SelectedPodcastImage = null;
                             }
 
@@ -291,10 +291,10 @@ public partial class MainWindowViewModel : ViewModelBase
                 if (!File.Exists(nextEpisode.EpisodeLocalPath) || nextEpisode.DownloadState != DownloadState.Downloaded)
                 {
                     Status = _downloadingEpisodeMessage;
-                    var error = await _podcastService.DownloadEpisode(nextEpisode);
-                    if (error is not null)
+                    var result = await _podcastService.DownloadEpisode(nextEpisode);
+                    if (result.IsFailure)
                     {
-                        Status = error;
+                        Status = result.Error;
                     }
                 }
             }
@@ -305,14 +305,14 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var result = await _podcastService.SearchPodcast(query);
         
-        if (result.error is null)
+        if (result.IsOk)
         {
             SearchPodcasts.Clear();
-            SearchPodcasts.AddRange(result.podcasts.OrderBy(x => x.Name));
+            SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
         }
         else
         {
-            Status = result.error;
+            Status = result.Error;
         }
     }
 
@@ -365,10 +365,10 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!File.Exists(episode.EpisodeLocalPath) || episode.DownloadState != DownloadState.Downloaded)
         {
             Status = _downloadingEpisodeMessage;
-            var error = await _podcastService.DownloadEpisode(episode);
-            if (error is not null)
+            var result = await _podcastService.DownloadEpisode(episode);
+            if (result.IsFailure)
             {
-                Status = error;
+                Status = result.Error;
                 return;
             }
         }
@@ -453,13 +453,13 @@ public partial class MainWindowViewModel : ViewModelBase
             }
 
             var result = await _podcastService.GetPodcast(podcast.PodcastUri);
-            if (result.error is null)
+            if (result.IsOk)
             {
-                updatedPodcasts.Add(result.podcast);
+                updatedPodcasts.Add(result.Value);
             }
             else
             {
-                Status = result.error;
+                Status = result.Error;
             }
         }
 
@@ -511,17 +511,23 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task AddPodcast(Podcast podcast)
     {
         var newFeedUri = podcast.PodcastUri;
+
+        if (newFeedUri is null)
+        {
+            return;
+        }
+
         var podcastResult = await _podcastService.GetPodcast(newFeedUri).ConfigureAwait(false);
 
-        if (podcastResult.error is null)
+        if (podcastResult.IsOk)
         {
-            var newPodcast = podcastResult.podcast;
+            var newPodcast = podcastResult.Value;
             Podcasts.Add(newPodcast);
             var imageResult = await _podcastService.DownloadImage(newPodcast);
 
-            if (imageResult.error is null)
+            if (imageResult.IsOk)
             {
-                newPodcast.ImageLocalPath = imageResult.fileFullName;
+                newPodcast.ImageLocalPath = imageResult.Value;
             }
             else
             {
@@ -534,7 +540,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            Status = podcastResult.error;
+            Status = podcastResult.Error;
         }        
     }
 

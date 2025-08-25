@@ -28,7 +28,7 @@ public readonly struct Result<TOk> : IEquatable<Result<TOk>>
     public static Result<TOk> Ok(TOk ok)
         => new(true, ok, null);
 
-    public static Result<TOk?> Fail(string? error)
+    public static Result<TOk> Fail(string error)
         => new(false, default, error);
 
     public bool IsOk => _isOk;
