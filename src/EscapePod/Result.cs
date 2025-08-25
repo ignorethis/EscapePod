@@ -27,20 +27,24 @@ public readonly struct Result : IEquatable<Result>
         => new(true, null);
 
     public static Result Fail(string error)
-        => new(false, error);
+    {
+        ArgumentNullException.ThrowIfNull(error);
+
+        return new Result(false, error);
+    }
 
     // Convenience methods for the other Result types.
 
     public static Result<TOk> Ok<TOk>(TOk ok)
         => Result<TOk>.Ok(ok);
 
-    public static Result<TOk?> Fail<TOk>(string error)
+    public static Result<TOk> Fail<TOk>(string error)
         => Result<TOk>.Fail(error);
 
-    public static Result<TOk, TError?> Ok<TOk, TError>(TOk ok)
+    public static Result<TOk, TError> Ok<TOk, TError>(TOk ok)
         => Result<TOk, TError>.Ok(ok);
 
-    public static Result<TOk?, TError> Fail<TOk, TError>(TError error)
+    public static Result<TOk, TError> Fail<TOk, TError>(TError error)
         => Result<TOk, TError>.Fail(error);
 
     public bool IsOk => _isOk;

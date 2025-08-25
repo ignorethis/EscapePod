@@ -10,10 +10,10 @@ namespace EscapePod;
 public readonly struct Result<TOk, TError> : IEquatable<Result<TOk, TError>>
 {
     [DataMember] private readonly bool _isOk;
-    [DataMember] private readonly TOk _ok;
-    [DataMember] private readonly TError _error;
+    [DataMember] private readonly TOk? _ok;
+    [DataMember] private readonly TError? _error;
 
-    private Result(bool isOk, TOk ok, TError error)
+    private Result(bool isOk, TOk? ok, TError? error)
     {
         if (isOk && error is not null || !isOk && error is null)
         {
@@ -25,19 +25,23 @@ public readonly struct Result<TOk, TError> : IEquatable<Result<TOk, TError>>
         _error = error;
     }
 
-    public static Result<TOk, TError?> Ok(TOk ok)
+    public static Result<TOk, TError> Ok(TOk ok)
         => new(true, ok, default);
 
-    public static Result<TOk?, TError> Fail(TError error)
-        => new(false, default, error);
+    public static Result<TOk, TError> Fail(TError error)
+    {
+        ArgumentNullException.ThrowIfNull(error);
+
+        return new Result<TOk, TError>(false, default, error);
+    }
 
     public bool IsOk => _isOk;
 
     public bool IsFailure => !_isOk;
 
-    public TOk Value => _isOk ? _ok : throw new InvalidOperationException();
+    public TOk Value => _isOk ? _ok! : throw new InvalidOperationException();
 
-    public TError Error => _isOk ? throw new InvalidOperationException() : _error;
+    public TError Error => _isOk ? throw new InvalidOperationException() : _error!;
 
     public override bool Equals(object? obj)
     {
