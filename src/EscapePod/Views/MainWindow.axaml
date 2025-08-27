@@ -67,6 +67,7 @@
             <ListBox
                 Grid.Column="0"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Hidden"
                 ItemsSource="{Binding Podcasts}"
                 SelectedItem="{Binding SelectedPodcast}">
                 <ListBox.ItemTemplate>
