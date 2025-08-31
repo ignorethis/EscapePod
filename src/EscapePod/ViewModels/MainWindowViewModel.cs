@@ -288,13 +288,22 @@ public partial class MainWindowViewModel : ViewModelBase
             if (nextIndex >= 0)
             {
                 var nextEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
-                if (!File.Exists(nextEpisode.EpisodeLocalPath) || nextEpisode.DownloadState != DownloadState.Downloaded)
+                if (!File.Exists(nextEpisode.EpisodeLocalPath) || nextEpisode.DownloadState is not DownloadState.Downloaded)
                 {
-                    Status = _downloadingEpisodeMessage;
-                    var result = await _podcastService.DownloadEpisode(nextEpisode);
-                    if (result.IsFailure)
+                    if (nextEpisode == _playingEpisode)
                     {
-                        Status = result.Error;
+                        _status = "Next Episode is same as current Episode";
+                        return;
+                    }
+
+                    else
+                    {
+                        Status = _downloadingEpisodeMessage;
+                        var result = await _podcastService.DownloadEpisode(nextEpisode);
+                        if (result.IsFailure)
+                        {
+                            Status = result.Error;
+                        }
                     }
                 }
             }
@@ -362,7 +371,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (!File.Exists(episode.EpisodeLocalPath) || episode.DownloadState != DownloadState.Downloaded)
+        if (!File.Exists(episode.EpisodeLocalPath) || episode.DownloadState is not DownloadState.Downloaded)
         {
             Status = _downloadingEpisodeMessage;
             var result = await _podcastService.DownloadEpisode(episode);
