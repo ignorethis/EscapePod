@@ -1,14 +1,13 @@
 ﻿using EscapePod.Models;
 using EscapePod.ViewModels;
 using NSubstitute;
-using TUnit.Assertions.AssertConditions.Throws;
 
 namespace EscapePod.Tests
 {
     public class MainWindowViewModelTests
     {
         [Test]
-        public async Task ConstructorTest_podcastServiceNull()
+        public async Task ConstructorTest_PodcastServiceNull()
         {
             Action act = () => new MainWindowViewModel(null);
 
