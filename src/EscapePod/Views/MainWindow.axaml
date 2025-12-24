@@ -190,8 +190,11 @@
 
         <Grid Grid.Row="3" Grid.Column="0" Height="200" ColumnDefinitions="Auto,*" IsVisible="{Binding SelectedPodcastPanelVisible}">
             <Image Grid.Column="0" Source="{Binding SelectedPodcastImage}" />
-            <!--Convert to TextBlock with Hyperlink Buttons-->
-            <WebView Grid.Column="1" HtmlContent="{Binding EpisodeDescriptionHtmlStyled}" />
+            <HtmlPanel
+                Grid.Column="1"
+                BaseStylesheet="{Binding DescriptionHtmlStylesheet}"
+                Margin="10,0,0,0"
+                Text="{Binding Path=DescriptionHtml}" />
         </Grid>
        
         <TextBlock

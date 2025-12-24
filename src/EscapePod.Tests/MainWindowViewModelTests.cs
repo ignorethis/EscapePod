@@ -42,7 +42,7 @@ namespace EscapePod.Tests
                 await Assert.That(viewModel.IsSearching).IsFalse();
                 await Assert.That(viewModel.SearchListBoxIndex).IsEqualTo(0);
                 await Assert.That(viewModel.SelectedPodcastPanelVisible).IsFalse();
-                await Assert.That(viewModel.EpisodeDescriptionHtmlStyled).IsNotEmpty();
+                await Assert.That(viewModel.DescriptionHtml).IsNotEmpty();
             }
 
             podcastService.Received().LoadFromDisk();
@@ -78,7 +78,7 @@ namespace EscapePod.Tests
                 await Assert.That(viewModel.IsSearching).IsFalse();
                 await Assert.That(viewModel.SearchListBoxIndex).IsEqualTo(0);
                 await Assert.That(viewModel.SelectedPodcastPanelVisible).IsFalse();
-                await Assert.That(viewModel.EpisodeDescriptionHtmlStyled).IsNotEmpty();
+                await Assert.That(viewModel.DescriptionHtml).IsNotEmpty();
             }
 
             podcastService.Received().LoadFromDisk();

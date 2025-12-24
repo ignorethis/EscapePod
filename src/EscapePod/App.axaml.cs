@@ -2,7 +2,6 @@ using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using AvaloniaWebView;
 using EscapePod.ViewModels;
 using EscapePod.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,12 +76,5 @@ public class App : Application
         });
         services.AddTransient<IPodcastService, PodcastService>();
         services.AddTransient<MainWindowViewModel>();
-    }
-
-    public override void RegisterServices()
-    {
-        base.RegisterServices();
-
-        AvaloniaWebViewBuilder.Initialize(null);
     }
 }

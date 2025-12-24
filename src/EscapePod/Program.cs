@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using System;
-using Avalonia.WebView.Desktop;
 
 namespace EscapePod;
 
@@ -15,6 +14,5 @@ public sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace()
-            .UseDesktopWebView();
+            .LogToTrace();
 }

@@ -16,6 +16,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly string _downloadingEpisodeMessage = "Downloading Episode ...";
     private readonly string _couldNotDownloadEpisodeError = "Could not download the episode.";
+    private readonly string _htmlTemplate = "<!DOCTYPE html><html><body>{0}</body></html>";
 
     private readonly IPodcastService _podcastService;
     private readonly WaveOutEvent _audioPlayer = new();
@@ -99,6 +100,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
 
             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
+            OnPropertyChanged(nameof(DescriptionHtml));
         }
     }
 
@@ -118,7 +120,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
-            OnPropertyChanged(nameof(EpisodeDescriptionHtmlStyled));
+            OnPropertyChanged(nameof(DescriptionHtml));
         }
     }
 
@@ -229,45 +231,42 @@ public partial class MainWindowViewModel : ViewModelBase
     public int SearchListBoxIndex => IsSearching ? 1 : 0;
     public bool SelectedPodcastPanelVisible => _selectedPodcast is not null;
 
-    private readonly string _episodeDescriptionHtmlStyledTemplate = """
-        <!DOCTYPE html>
+    public string DescriptionHtmlStylesheet { get; } = """
+        * {
+            color: white;
+        }
 
-        <html>
-        <head>
-            <style>
-                body {{
-                    background-color: black;
-                    color: white;
-                    margin: 0 0.5rem;
-                    padding: 0;
-                }}
-                
-                p {{
-                    margin: 0 0 0.5rem 0;
-                    padding: 0;
-                }}
+        body {
+            color: white;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
 
-                a {{
-                    color: white;
-                }}
-            </style>
-        </head>
-        <body>
-            {0}
-        </body>
-        </html>
-        """;
+        p {
+            margin: 0 0 16px 0;
+        }
 
-    public string EpisodeDescriptionHtmlStyled
+        a {
+            color: white;
+        }
+    """;
+
+    public string DescriptionHtml
     {
         get
         {
-            if (SelectedEpisode is null)
+            if (_selectedEpisode is not null)
             {
-                return string.Format(_episodeDescriptionHtmlStyledTemplate, string.Empty);
+                return string.Format(_htmlTemplate, _selectedEpisode.Description);
             }
 
-            return string.Format(_episodeDescriptionHtmlStyledTemplate, SelectedEpisode.Description);
+            if (_selectedPodcast is not null)
+            {
+                return string.Format(_htmlTemplate, $"<p>{_selectedPodcast.Description}</p>");
+            }
+
+            return string.Empty;
         }
     }
 
