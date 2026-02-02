@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -447,10 +448,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public async Task UpdateAllPodcasts()
     {
-        //alten zustand merken
-        var oldSelectedPodcastUri = SelectedPodcast?.PodcastUri;
-        var oldSelectedEpisodeUri = SelectedEpisode?.EpisodeUri;
-
         //neuen stuff laden
         List<Podcast> updatedPodcasts = [];
         foreach (Podcast podcast in Podcasts)
@@ -460,6 +457,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 continue;
             }
 
+            // TODO: parallelize
             var result = await _podcastService.GetPodcast(podcast.PodcastUri);
             if (result.IsOk)
             {
@@ -471,23 +469,37 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
 
-        //das alte zerstoeren
-        Podcasts.Clear();
-        foreach (Podcast updatedPodcast in updatedPodcasts)
+        //altdaten updaten
+        var podcastsByUri = Podcasts.ToDictionary(p => p.PodcastUri);
+        foreach (var updatedPodcast in updatedPodcasts)
         {
-            Podcasts.Add(updatedPodcast);
-        }
+            var oldPodcastFound = podcastsByUri.TryGetValue(updatedPodcast.PodcastUri, out Podcast? podcast);
+            if (!oldPodcastFound || podcast is null)
+            {
+                continue;
+            }
 
-        //alten zustand wiederherstellen
-        SelectedPodcast = oldSelectedPodcastUri is null
-            ? null
-            : Podcasts.FirstOrDefault(p => p.PodcastUri == oldSelectedPodcastUri);
+            podcast.ApplyUpdate(updatedPodcast);
 
-        if (_selectedPodcast is not null)
-        {
-            SelectedEpisode = oldSelectedEpisodeUri is null
-                ? null
-                : _selectedPodcast.Episodes.FirstOrDefault(e => e.EpisodeUri == oldSelectedEpisodeUri);
+            var episodesByUri = podcast.Episodes.ToDictionary(e => e.EpisodeUri);
+            foreach (var updatedEpisode in updatedPodcast.Episodes)
+            {
+                var oldEpisodeFound = episodesByUri.TryGetValue(updatedEpisode.EpisodeUri, out Episode? episode);
+                if (episode is null)
+                {
+                    continue;
+                }
+
+                if (oldEpisodeFound)
+                {
+                    episode.ApplyUpdate(updatedEpisode);
+                    continue;
+                }
+
+                // UpdatedEpisode is a new Episode
+                updatedEpisode.Podcast = podcast;
+                podcast.Episodes.Add(updatedEpisode);
+            }
         }
 
         await _podcastService.SaveToDisk(Podcasts);

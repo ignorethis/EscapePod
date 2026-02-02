@@ -19,6 +19,7 @@ namespace EscapePod.ViewModels
                 Name = "Podcast_Name",
                 Language = "Podcast_Language",
                 LastUpdate = DateTime.Now.AddDays(-5),
+                PodcastUri = new Uri("http://www.test.de/Podcast1Uri/"),
                 Subtitle = "Podcast_Subtitle"
             };
 

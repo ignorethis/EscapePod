@@ -51,7 +51,7 @@ namespace EscapePod.Tests
         [Test]
         public async Task ConstructorTest2()
         {
-            var podcasts = new List<Podcast>() { new Podcast() };
+            var podcasts = new List<Podcast>() { new() { PodcastUri = new Uri("https://PodcastUri/") } };
 
             var podcastService = Substitute.For<IPodcastService>();
             podcastService.LoadFromDisk().Returns(podcasts);

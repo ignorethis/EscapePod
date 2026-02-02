@@ -10,17 +10,17 @@ public sealed class Episode : ObservableObject
     [JsonIgnore]
     public Podcast Podcast { get; set; }
 
-    public string Author { get; init; }
-    public string Description { get; init; }
-    public bool IsExplicit { get; init; }
-    public string MimeType { get; init; }
-    public string Name { get; init; }
-    public DateTime PublishDate { get; init; }
-    public string Subtitle { get; init; }
-    public string Summary { get; init; }
+    public string Author { get; set; }
+    public string Description { get; set; }
+    public bool IsExplicit { get; set; }
+    public string MimeType { get; set; }
+    public string Name { get; set; }
+    public DateTime PublishDate { get; set; }
+    public string Subtitle { get; set; }
+    public string Summary { get; set; }
 
     public Uri EpisodeUri { get; init; }
-    public Uri? ImageUri { get; init; }
+    public Uri? ImageUri { get; set; }
 
     public string EpisodeLocalPath { get; set; }
     public string ImageLocalPath { get; set; }
@@ -98,4 +98,25 @@ public sealed class Episode : ObservableObject
             > 95 and <= 100 => ListenState.Finished,
             _ => throw new SwitchExpressionException(ListenPercent)
         };
+
+    public void ApplyUpdate(Episode updatedEpisode)
+    {
+        // Podcast stays the same
+        Author = updatedEpisode.Author;
+        Description = updatedEpisode.Description;
+        IsExplicit = updatedEpisode.IsExplicit;
+        // Length stays the same
+        MimeType = updatedEpisode.MimeType;
+        Name = updatedEpisode.Name;
+        PublishDate = updatedEpisode.PublishDate;
+        Subtitle = updatedEpisode.Subtitle;
+        Summary = updatedEpisode.Summary;
+        // EpisodeUri stays the same
+        ImageUri = updatedEpisode.ImageUri;
+        // DownloadState stays the same
+        // EpisodeLocalPath stays the same
+        // ImageLocalPath stays the same
+        // ListenLastAt  stays the same
+        // ListenStoppedAt stays the same
+    }
 }
