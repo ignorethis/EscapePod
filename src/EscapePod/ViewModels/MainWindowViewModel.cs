@@ -102,8 +102,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
             OnPropertyChanged(nameof(DescriptionHtml));
+            OnPropertyChanged(nameof(SelectedPodcastEpisodes));
         }
     }
+
+    public List<Episode> SelectedPodcastEpisodes => SelectedPodcast?.Episodes.OrderByDescending(e => e.PublishDate).ToList() ?? new List<Episode>();
 
     public Bitmap? SelectedPodcastImage
     {
@@ -485,11 +488,6 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var updatedEpisode in updatedPodcast.Episodes)
             {
                 var oldEpisodeFound = episodesByUri.TryGetValue(updatedEpisode.EpisodeUri, out Episode? episode);
-                if (episode is null)
-                {
-                    continue;
-                }
-
                 if (oldEpisodeFound)
                 {
                     episode.ApplyUpdate(updatedEpisode);
@@ -498,10 +496,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
                 // UpdatedEpisode is a new Episode
                 updatedEpisode.Podcast = podcast;
-                podcast.Episodes.Add(updatedEpisode);
+                podcast.Episodes.Insert(0, updatedEpisode);
             }
         }
-
+        OnPropertyChanged(nameof(SelectedPodcastEpisodes));
         await _podcastService.SaveToDisk(Podcasts);
     }
 

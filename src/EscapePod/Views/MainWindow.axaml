@@ -95,7 +95,7 @@
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
                 AutoScrollToSelectedItem="True"
-                ItemsSource="{Binding SelectedPodcast.Episodes}"
+                ItemsSource="{Binding SelectedPodcastEpisodes}"
                 SelectedItem="{Binding SelectedEpisode}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Episode}">
