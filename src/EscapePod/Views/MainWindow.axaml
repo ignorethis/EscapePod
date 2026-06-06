@@ -24,7 +24,7 @@
         <TextBox
             Grid.Row="0"
             Text="{Binding SearchValue}"
-            Watermark="Search for podcasts" />
+            PlaceholderText="Search for podcasts" />
 
         <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,*">
             <ListBox
