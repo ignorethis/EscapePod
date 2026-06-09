@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
@@ -10,6 +10,7 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.Input;
 using EscapePod.Models;
 using NAudio.Wave;
+using Timer = System.Timers.Timer;
 
 namespace EscapePod.ViewModels;
 
@@ -33,6 +34,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private Episode? _playingEpisode;
     private string _searchValue = string.Empty;
     private string _status = string.Empty;
+
+    private CancellationTokenSource? _searchPodcastCts;
 
     public MainWindowViewModel(IPodcastService podcastService)
     {
@@ -161,7 +164,36 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
-            PodcastSearch(value).ConfigureAwait(true);
+            _searchPodcastCts?.Cancel();
+            _searchPodcastCts = new CancellationTokenSource();
+            var cts = _searchPodcastCts;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var result = await _podcastService.SearchPodcast(value).ConfigureAwait(false);
+                    if (cts.IsCancellationRequested) // result is stale, we should ignore it.
+                    {
+                        return;
+                    }
+
+                    if (result.IsOk)
+                    {
+                        SearchPodcasts.Clear();
+                        SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
+                    }
+                    else
+                    {
+                        Status = result.Error;
+                    }
+                }
+                catch (Exception e)
+                {
+                    // TODO: LOG
+                    Status = e.Message;
+                }
+            });
+
             OnPropertyChanged(nameof(SearchListBoxIndex));
         }
     }
@@ -316,21 +348,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             // TODO: LOG
             Status = ex.Message;
-        }
-    }
-
-    public async Task PodcastSearch(string query)
-    {
-        var result = await _podcastService.SearchPodcast(query);
-        
-        if (result.IsOk)
-        {
-            SearchPodcasts.Clear();
-            SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
-        }
-        else
-        {
-            Status = result.Error;
         }
     }
 
