@@ -86,6 +86,11 @@ public sealed class Episode : ObservableObject
                 return 0;
             }
 
+            if (Length == TimeSpan.Zero)
+            {
+                return 5; //ListenLastAt != null
+            }
+
             return (ListenStoppedAt ?? TimeSpan.Zero) / Length * 100;
         }
     }
