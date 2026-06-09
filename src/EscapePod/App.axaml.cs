@@ -75,7 +75,7 @@ public class App : Application
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0");
             c.Timeout = TimeSpan.FromMinutes(10);
         });
-        services.AddTransient<IPodcastService, PodcastService>();
-        services.AddTransient<MainWindowViewModel>();
+        services.AddSingleton<IPodcastService, PodcastService>();
+        services.AddSingleton<MainWindowViewModel>();
     }
 }

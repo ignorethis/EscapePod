@@ -14,7 +14,7 @@ using Timer = System.Timers.Timer;
 
 namespace EscapePod.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly string _downloadingEpisodeMessage = "Downloading Episode ...";
     private readonly string _couldNotDownloadEpisodeError = "Could not download the episode.";
@@ -132,7 +132,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public Bitmap? SelectedPodcastImage
     {
         get => _selectedPodcastImage;
-        set => SetProperty(ref _selectedPodcastImage, value);
+        set
+        {
+            _selectedPodcastImage?.Dispose();
+            SetProperty(ref _selectedPodcastImage, value);
+        }
     }
 
     public Episode? SelectedEpisode
@@ -152,7 +156,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public Bitmap? PlayingPodcastImage
     {
         get => _playingPodcastImage;
-        set => SetProperty(ref _playingPodcastImage, value);
+        set
+        {
+            _playingPodcastImage?.Dispose();
+            SetProperty(ref _playingPodcastImage, value);
+        }
     }
 
     public Episode? PlayingEpisode
@@ -443,6 +451,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
         PlayingEpisode = episode;
 
+        if (_audioFileReader != null)
+        {
+            await _audioFileReader.DisposeAsync();
+        }
         _audioFileReader = new AudioFileReader(episode.EpisodeLocalPath);
         _audioPlayer.Init(_audioFileReader);
         _audioFileReader.CurrentTime = episode.ListenStoppedAt ?? TimeSpan.Zero;
@@ -630,5 +642,17 @@ public partial class MainWindowViewModel : ViewModelBase
         Podcasts.Remove(podcast);
 
         await _podcastService.SaveToDisk(Podcasts);
+    }
+
+    public void Dispose()
+    {
+        _audioPlayer.Dispose();
+        _episodeIsPlayingTimer.Dispose();
+        _audioFileReader?.Dispose();
+        _selectedPodcastImage?.Dispose();
+        _playingPodcastImage?.Dispose();
+        _searchPodcastCts?.Dispose();
+        _selectedPodcastDownloadImageCts?.Dispose();
+        _statusCts?.Dispose();
     }
 }
