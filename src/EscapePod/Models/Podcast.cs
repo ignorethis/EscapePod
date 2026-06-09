@@ -53,5 +53,7 @@ public sealed class Podcast : ObservableObject
         LastUpdate = updatedPodcast.LastUpdate;
         Id = updatedPodcast.Id;
         PodcastLocalPath = updatedPodcast.PodcastLocalPath;
+
+        OnPropertyChanged((string?)null);
     }
 }

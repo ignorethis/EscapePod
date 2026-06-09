@@ -123,5 +123,7 @@ public sealed class Episode : ObservableObject
         // ImageLocalPath stays the same
         // ListenLastAt  stays the same
         // ListenStoppedAt stays the same
+
+        OnPropertyChanged((string?)null);
     }
 }
