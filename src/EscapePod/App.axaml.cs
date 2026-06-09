@@ -12,6 +12,7 @@ namespace EscapePod;
 public class App : Application
 {
     private IHost? _host;
+    private MainWindowViewModel? _mainWindowViewModel;
 
     public override void Initialize()
     {
@@ -26,10 +27,10 @@ public class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindowVm = _host.Services.GetRequiredService<MainWindowViewModel>();
+            _mainWindowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
 
             desktop.ShutdownRequested += OnShutdownRequested;
-            desktop.MainWindow = new MainWindow() { DataContext = mainWindowVm };
+            desktop.MainWindow = new MainWindow() { DataContext = _mainWindowViewModel };
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -41,16 +42,16 @@ public class App : Application
 
         try
         {
-            if (_host != null)
+            if (_host is null || _mainWindowViewModel is null)
             {
-                var podcastService = _host.Services.GetRequiredService<PodcastService>();
-                var mainWindowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
-
-                await podcastService.SaveToDisk(mainWindowViewModel.Podcasts);
-
-                await _host.StopAsync();
-                _host.Dispose();
+                return;
             }
+
+            var podcastService = _host.Services.GetRequiredService<IPodcastService>();
+            await podcastService.SaveToDisk(_mainWindowViewModel.Podcasts);
+
+            await _host.StopAsync();
+            _host.Dispose();
         }
         catch (Exception)
         {
