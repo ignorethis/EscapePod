@@ -276,31 +276,32 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async void EpisodeIsPlayingTimer_Elapsed(object? sender, ElapsedEventArgs e)
     {
-        if (_playingEpisode is null || _audioFileReader is null)
+        try
         {
-            return;
-        }
-
-        _playingEpisode.ListenStoppedAt = _audioFileReader.CurrentTime;
-        _playingEpisode.ListenLastAt = e.SignalTime;
-        OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
-
-        if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
-        {
-            var nextIndex = _playingEpisode.Podcast.Episodes.IndexOf(_playingEpisode) - 1;
-            if (nextIndex >= 0)
+            if (_playingEpisode is null || _audioFileReader is null)
             {
-                var nextEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
-                if (!File.Exists(nextEpisode.EpisodeLocalPath) || nextEpisode.DownloadState is not DownloadState.Downloaded)
-                {
-                    if (nextEpisode == _playingEpisode)
-                    {
-                        _status = "Next Episode is same as current Episode";
-                        return;
-                    }
+                return;
+            }
 
-                    else
+            _playingEpisode.ListenStoppedAt = _audioFileReader.CurrentTime;
+            _playingEpisode.ListenLastAt = e.SignalTime;
+            OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
+
+            if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
+            {
+                var nextIndex = _playingEpisode.Podcast.Episodes.IndexOf(_playingEpisode) - 1;
+                if (nextIndex >= 0)
+                {
+                    var nextEpisode = _playingEpisode.Podcast.Episodes.ElementAt(nextIndex);
+                    if (!File.Exists(nextEpisode.EpisodeLocalPath) ||
+                        nextEpisode.DownloadState is not DownloadState.Downloaded)
                     {
+                        if (nextEpisode == _playingEpisode)
+                        {
+                            _status = "Next Episode is same as current Episode";
+                            return;
+                        }
+
                         Status = _downloadingEpisodeMessage;
                         var result = await _podcastService.DownloadEpisode(nextEpisode);
                         if (result.IsFailure)
@@ -310,6 +311,11 @@ public partial class MainWindowViewModel : ViewModelBase
                     }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            // TODO: LOG
+            Status = ex.Message;
         }
     }
 
