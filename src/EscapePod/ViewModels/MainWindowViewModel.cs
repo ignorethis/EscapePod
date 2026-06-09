@@ -36,6 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _status = string.Empty;
 
     private CancellationTokenSource? _searchPodcastCts;
+    private CancellationTokenSource? _selectedPodcastDownloadImageCts;
 
     public MainWindowViewModel(IPodcastService podcastService)
     {
@@ -78,19 +79,35 @@ public partial class MainWindowViewModel : ViewModelBase
                     }
                     else
                     {
+                        _selectedPodcastDownloadImageCts?.Cancel();
+                        _selectedPodcastDownloadImageCts = new CancellationTokenSource();
+                        var cts = _selectedPodcastDownloadImageCts;
                         Task.Run(async () =>
                         {
-                            var result = await _podcastService.DownloadImage(value);
-                            if (result.IsOk)
+                            try
                             {
-                                value.ImageLocalPath = result.Value;
-                                await _podcastService.SaveToDisk(Podcasts);
-                                SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
+                                var result = await _podcastService.DownloadImage(value).ConfigureAwait(false);
+                                if (cts.IsCancellationRequested) //result is stale, user selected another podcast already.
+                                {
+                                    return;
+                                }
+
+                                if (result.IsOk)
+                                {
+                                    value.ImageLocalPath = result.Value;
+                                    await _podcastService.SaveToDisk(Podcasts);
+                                    SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
+                                }
+                                else
+                                {
+                                    Status = result.Error;
+                                    SelectedPodcastImage = null;
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                Status = result.Error;
-                                SelectedPodcastImage = null;
+                                // TODO: LOG
+                                Status = e.Message;
                             }
 
                             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
