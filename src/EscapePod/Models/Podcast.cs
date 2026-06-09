@@ -16,7 +16,7 @@ public sealed class Podcast : ObservableObject
     public string Copyright { get; set; }
     public DateTime? LastUpdate { get; set; }
 
-    public required Uri PodcastUri { get; init; }
+    public required Uri? PodcastUri { get; init; }
     public Uri? ImageUri { get; set; }
     public Uri? WebsiteUri { get; set; }
 
