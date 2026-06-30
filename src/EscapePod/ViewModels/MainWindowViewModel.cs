@@ -16,7 +16,7 @@ namespace EscapePod.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly string _downloadingEpisodeMessage = "Downloading Episode ...";
-    private readonly string _couldNotDownloadEpisodeError = "Could not download the episode.";
+    private readonly string _couldNotDownloadEpisodeError = "Could not download the episode: {0}";
     private readonly string _htmlTemplate = "<!DOCTYPE html><html><body>{0}</body></html>";
 
     private readonly IPodcastService _podcastService;
@@ -347,7 +347,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                         var result = await _podcastService.DownloadEpisode(nextEpisode);
                         if (result.IsFailure)
                         {
-                            Status = result.Error;
+                            Status = string.Format(_couldNotDownloadEpisodeError, result.Error);
                         }
                     }
                 }
