@@ -15,6 +15,8 @@ namespace EscapePod;
 
 public sealed class PodcastService : IPodcastService
 {
+    private readonly int _maxFileNameLength = 50;
+
     private readonly string _contentDirectoryPath;
     private readonly string _savefilePath;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -197,6 +199,10 @@ public sealed class PodcastService : IPodcastService
         var invalidFileNameChars = new List<char>(Path.GetInvalidFileNameChars());
         invalidFileNameChars.Add('.');
         var validFileName = string.Join("_", fileName.Split(invalidFileNameChars.ToArray()).Select(s => s.Trim()));
+        if (_maxFileNameLength < validFileName.Length)
+        {
+            validFileName = validFileName[.._maxFileNameLength];
+        }
 
         return Path.Combine(validPath, validFileName + extension);
     }
