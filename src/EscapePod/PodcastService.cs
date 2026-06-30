@@ -83,8 +83,6 @@ public sealed class PodcastService : IPodcastService
             return Result.Fail(_episodeMissingMimeTypeError);
         }
 
-        var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
-
         if (episode.EpisodeUri is null)
         {
             return Result.Fail(_episodeMissingUriError);
@@ -101,6 +99,8 @@ public sealed class PodcastService : IPodcastService
         }
 
         episode.DownloadState = DownloadState.IsDownloading;
+
+        var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
         var result = await DownloadFile(
                 episode.EpisodeUri,
                 episode.Podcast.PodcastLocalPath,
@@ -138,7 +138,13 @@ public sealed class PodcastService : IPodcastService
                 return Result<string>.Fail(_podcastMissingNameError);
             }
 
-            return await DownloadFile(podcast.ImageUri, podcast.PodcastLocalPath, podcast.Name, podcast.ImageUri.AbsolutePath.Split('.').Last())
+            var extension = Path.GetExtension(podcast.ImageUri.AbsolutePath);
+            if (extension == string.Empty)
+            {
+                extension = ".jpg";
+            }
+
+            return await DownloadFile(podcast.ImageUri, podcast.PodcastLocalPath, podcast.Name, extension)
                 .ConfigureAwait(false);
         }
 
@@ -192,7 +198,7 @@ public sealed class PodcastService : IPodcastService
         invalidFileNameChars.Add('.');
         var validFileName = string.Join("_", fileName.Split(invalidFileNameChars.ToArray()).Select(s => s.Trim()));
 
-        return Path.Combine(validPath, validFileName + "." + extension);
+        return Path.Combine(validPath, validFileName + extension);
     }
 
     public async Task SaveToDisk(IEnumerable<Podcast> podcasts)
@@ -280,7 +286,7 @@ public sealed class PodcastService : IPodcastService
             IsExplicit = explicitValue is "yes",
             Language = languageValue ?? string.Empty,
             Copyright = copyrightValue ?? string.Empty,
-            LastUpdate = lastBuildDateValue is null ? null : DateTime.Parse(lastBuildDateValue),
+            LastUpdate = DateTime.TryParse(lastBuildDateValue, out DateTime date) ? date : null,
             Id = outerPodcast.ItunesId,
             PodcastLocalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod", validPathName),
         };
