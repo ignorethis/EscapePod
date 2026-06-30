@@ -4,13 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using Avalonia.Collections;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using EscapePod.Models;
 using NAudio.Wave;
-using Timer = System.Timers.Timer;
 
 namespace EscapePod.ViewModels;
 
@@ -22,7 +21,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private readonly IPodcastService _podcastService;
     private readonly WaveOutEvent _audioPlayer = new();
-    private readonly Timer _episodeIsPlayingTimer = new(TimeSpan.FromSeconds(1));
+    private readonly DispatcherTimer _episodeIsPlayingTimer = new() { Interval = TimeSpan.FromSeconds(1) };
 
     private AudioFileReader? _audioFileReader;
 
@@ -45,7 +44,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
      
         var podcasts = _podcastService.LoadFromDisk();
         Podcasts.AddRange(podcasts);
-        _episodeIsPlayingTimer.Elapsed += EpisodeIsPlayingTimer_Elapsed;
+        _episodeIsPlayingTimer.Tick += EpisodeIsPlayingTimer_Elapsed;
     }
 
     public Podcast? SelectedSearchPodcast
@@ -341,7 +340,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async void EpisodeIsPlayingTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private async void EpisodeIsPlayingTimer_Elapsed(object? sender, EventArgs e)
     {
         try
         {
@@ -351,7 +350,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             }
 
             _playingEpisode.ListenStoppedAt = _audioFileReader.CurrentTime;
-            _playingEpisode.ListenLastAt = e.SignalTime;
+            _playingEpisode.ListenLastAt = DateTime.Now;
             OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
 
             if (_audioFileReader.CurrentTime > _playingEpisode.Length * 0.8)
@@ -647,7 +646,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void Dispose()
     {
         _audioPlayer.Dispose();
-        _episodeIsPlayingTimer.Dispose();
         _audioFileReader?.Dispose();
         _selectedPodcastImage?.Dispose();
         _playingPodcastImage?.Dispose();
