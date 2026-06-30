@@ -20,6 +20,13 @@ public sealed class PodcastService : IPodcastService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly PodcastFinder _podcastFinder;
 
+    private readonly string _episodeMissingMimeTypeError = "The episode is missing a mime type.";
+    private readonly string _episodeMissingNameError = "The episode is missing a name.";
+    private readonly string _episodeMissingUriError = "The episode is missing an URI.";
+    private readonly string _podcastMissingImageUriError = "The podcast is missing an image URI.";
+    private readonly string _podcastMissingLocalPathError = "The podcast of the episode is missing a local path.";
+    private readonly string _podcastMissingNameError = "The podcast is missing a name.";
+
     public PodcastService(IHttpClientFactory httpClientFactory)
     {
         _contentDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EscapePod");
@@ -71,7 +78,27 @@ public sealed class PodcastService : IPodcastService
             return Result.Ok();
         }
 
+        if (episode.MimeType is null)
+        {
+            return Result.Fail(_episodeMissingMimeTypeError);
+        }
+
         var extension = MimeTypeHelper.GetFileExtensionFromMimeType(episode.MimeType);
+
+        if (episode.EpisodeUri is null)
+        {
+            return Result.Fail(_episodeMissingUriError);
+        }
+
+        if (episode.Podcast?.PodcastLocalPath is null)
+        {
+            return Result.Fail(_podcastMissingLocalPathError);
+        }
+
+        if (episode.Name is null)
+        {
+            return Result.Fail(_episodeMissingNameError);
+        }
 
         episode.DownloadState = DownloadState.IsDownloading;
         var result = await DownloadFile(
@@ -98,8 +125,19 @@ public sealed class PodcastService : IPodcastService
         {
             if (podcast.ImageUri is null)
             {
-                return Result<string>.Fail("Podcast Image Uri is null");
+                return Result<string>.Fail(_podcastMissingImageUriError);
             }
+
+            if (podcast.PodcastLocalPath is null)
+            {
+                return Result<string>.Fail(_podcastMissingLocalPathError);
+            }
+
+            if (podcast.Name is null)
+            {
+                return Result<string>.Fail(_podcastMissingNameError);
+            }
+
             return await DownloadFile(podcast.ImageUri, podcast.PodcastLocalPath, podcast.Name, podcast.ImageUri.AbsolutePath.Split('.').Last())
                 .ConfigureAwait(false);
         }

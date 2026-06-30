@@ -344,7 +344,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         try
         {
-            if (_playingEpisode is null || _audioFileReader is null)
+            if (_playingEpisode?.Podcast is null || _audioFileReader is null)
             {
                 return;
             }
@@ -470,7 +470,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     public void NextEpisode()
     {
-        if (_playingEpisode is null)
+        if (_playingEpisode?.Podcast is null)
         {
             return;
         }
@@ -491,7 +491,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     public void PreviousEpisode()
     {
-        if (_playingEpisode is null)
+        if (_playingEpisode?.Podcast is null)
         {
             return;
         }
@@ -549,7 +549,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             foreach (var updatedEpisode in updatedPodcast.Episodes)
             {
                 var oldEpisodeFound = episodesByUri.TryGetValue(updatedEpisode.EpisodeUri, out Episode? episode);
-                if (oldEpisodeFound)
+                if (oldEpisodeFound && episode is not null)
                 {
                     episode.ApplyUpdate(updatedEpisode);
                     continue;

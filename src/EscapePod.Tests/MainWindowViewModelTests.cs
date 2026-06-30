@@ -9,7 +9,7 @@ namespace EscapePod.Tests
         [Test]
         public async Task ConstructorTest_PodcastServiceNull()
         {
-            Action act = () => new MainWindowViewModel(null);
+            Action act = () => new MainWindowViewModel(null!);
 
             await Assert.That(act).Throws<ArgumentNullException>().WithParameterName("podcastService");
         }
