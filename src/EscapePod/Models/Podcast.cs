@@ -6,14 +6,14 @@ namespace EscapePod.Models;
 
 public sealed class Podcast : ObservableObject
 {
-    public string Id { get; set; }
-    public string Author { get; set; }
-    public string Name { get; set; }
-    public string Subtitle { get; set; }
-    public string Description { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string? Author { get; set; }
+    public string? Name { get; set; }
+    public string? Subtitle { get; set; }
+    public string? Description { get; set; }
     public bool IsExplicit { get; set; }
-    public string Language { get; set; }
-    public string Copyright { get; set; }
+    public string? Language { get; set; }
+    public string? Copyright { get; set; }
     public DateTime? LastUpdate { get; set; }
 
     public required Uri? PodcastUri { get; init; }
@@ -29,8 +29,8 @@ public sealed class Podcast : ObservableObject
         set => SetProperty(ref _imageLocalPath, value);
     }
 
-    private string _podcastLocalPath;
-    public string PodcastLocalPath
+    private string? _podcastLocalPath;
+    public string? PodcastLocalPath
     {
         get => _podcastLocalPath;
         set => SetProperty(ref _podcastLocalPath, value);

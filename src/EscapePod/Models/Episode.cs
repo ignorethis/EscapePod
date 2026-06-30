@@ -8,22 +8,22 @@ namespace EscapePod.Models;
 public sealed class Episode : ObservableObject
 {
     [JsonIgnore]
-    public Podcast Podcast { get; set; }
+    public Podcast? Podcast { get; set; }
 
-    public string Author { get; set; }
-    public string Description { get; set; }
-    public bool IsExplicit { get; set; }
-    public string MimeType { get; set; }
-    public string Name { get; set; }
-    public DateTime PublishDate { get; set; }
-    public string Subtitle { get; set; }
-    public string Summary { get; set; }
+    public string? Author { get; set; }
+    public string? Description { get; set; }
+    public bool? IsExplicit { get; set; }
+    public string? MimeType { get; set; }
+    public string? Name { get; set; }
+    public DateTime? PublishDate { get; set; }
+    public string? Subtitle { get; set; }
+    public string? Summary { get; set; }
 
-    public Uri EpisodeUri { get; init; }
+    public Uri? EpisodeUri { get; init; }
     public Uri? ImageUri { get; set; }
 
-    public string EpisodeLocalPath { get; set; }
-    public string ImageLocalPath { get; set; }
+    public string? EpisodeLocalPath { get; set; }
+    public string? ImageLocalPath { get; set; }
 
     private DownloadState _downloadState;
     public DownloadState DownloadState
