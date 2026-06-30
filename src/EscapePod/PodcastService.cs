@@ -153,20 +153,7 @@ public sealed class PodcastService : IPodcastService
         return Result.Ok(podcast.ImageLocalPath);
     }
 
-    public async Task<Result> DownloadAllEpisodes(Podcast podcast)
-    {
-        var episodesToDownload = podcast.Episodes.OrderByDescending(e => e.PublishDate).Select(async e => await DownloadEpisode(e));
-        var results = await Task.WhenAll(episodesToDownload);
-        var failures = results.Where(r => r.IsFailure).ToList();
-        if (failures.Any())
-        {
-            return Result.Fail(failures.First().Error);
-        }
-
-        return Result.Ok();
-    }
-
-    public async Task<Result<string>> DownloadFile(Uri uri, string directoryPath, string name, string extension)
+    private async Task<Result<string>> DownloadFile(Uri uri, string directoryPath, string name, string extension)
     {
         using var httpClient = _httpClientFactory.CreateClient(HttpClientName.Default);
         var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
@@ -191,7 +178,7 @@ public sealed class PodcastService : IPodcastService
         return Result<string>.Ok(fileFullName);
     }
 
-    public string GetFileFullName(string localPath, string fileName, string extension)
+    private string GetFileFullName(string localPath, string fileName, string extension)
     {
         var invalidPathChars = new List<char>(Path.GetInvalidPathChars());
         var validPath = string.Join("_", localPath.Split(invalidPathChars.ToArray()).Select(s => s.Trim()));
@@ -248,7 +235,7 @@ public sealed class PodcastService : IPodcastService
         return podcasts;
     }
 
-    public Podcast PodcastConversion(PodcastRequestResult podcastRequestResult)
+    private Podcast PodcastConversion(PodcastRequestResult podcastRequestResult)
     {
         var podcast = GetPodcastFrom(podcastRequestResult.Podcast);
 
