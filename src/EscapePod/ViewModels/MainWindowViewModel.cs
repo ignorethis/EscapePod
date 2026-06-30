@@ -204,18 +204,21 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
                     if (result.IsOk)
                     {
-                        SearchPodcasts.Clear();
-                        SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            SearchPodcasts.Clear();
+                            SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
+                        });
                     }
                     else
                     {
-                        Status = result.Error;
+                        await Dispatcher.UIThread.InvokeAsync(() => { Status = result.Error; });
                     }
                 }
                 catch (Exception e)
                 {
                     // TODO: LOG
-                    Status = e.Message;
+                    await Dispatcher.UIThread.InvokeAsync(() => { Status = e.Message; });
                 }
             });
 
