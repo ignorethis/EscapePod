@@ -191,38 +191,35 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             _searchPodcastCts?.Cancel();
             _searchPodcastCts = new CancellationTokenSource();
-            var cts = _searchPodcastCts;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var result = await _podcastService.SearchPodcast(value).ConfigureAwait(false);
-                    if (cts.IsCancellationRequested) // result is stale, we should ignore it.
-                    {
-                        return;
-                    }
-
-                    if (result.IsOk)
-                    {
-                        await Dispatcher.UIThread.InvokeAsync(() =>
-                        {
-                            SearchPodcasts.Clear();
-                            SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
-                        });
-                    }
-                    else
-                    {
-                        await Dispatcher.UIThread.InvokeAsync(() => { Status = result.Error; });
-                    }
-                }
-                catch (Exception e)
-                {
-                    // TODO: LOG
-                    await Dispatcher.UIThread.InvokeAsync(() => { Status = e.Message; });
-                }
-            });
-
+            _ = SearchPodcastsAsync(value, _searchPodcastCts);
             OnPropertyChanged(nameof(SearchListBoxIndex));
+        }
+    }
+
+    private async Task SearchPodcastsAsync(string searchValue, CancellationTokenSource cts)
+    {
+        try
+        {
+            var result = await Task.Run(() => _podcastService.SearchPodcast(searchValue));
+            if (cts.IsCancellationRequested) // result is stale, we should ignore it.
+            {
+                return;
+            }
+
+            if (result.IsOk)
+            {
+                SearchPodcasts.Clear();
+                SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
+            }
+            else
+            {
+                Status = result.Error;
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO: LOG
+            Status = e.Message;
         }
     }
 
@@ -469,6 +466,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(PlayingEpisodeListenProgress));
         OnPropertyChanged(nameof(PlayingEpisodeListenProgressMax));
     }
+
+
 
     [RelayCommand]
     public void NextEpisode()
