@@ -96,35 +96,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async Task DownloadPodcastImageAsync(Podcast podcast, CancellationTokenSource cts)
-    {
-        try
-        {
-            var result = await Task.Run(() => _podcastService.DownloadImage(podcast));
-            if (cts.IsCancellationRequested) //result is stale, user selected another podcast already.
-            {
-                return;
-            }
-
-            if (result.IsOk)
-            {
-                podcast.ImageLocalPath = result.Value;
-                await _podcastService.SaveToDisk(Podcasts);
-                SelectedPodcastImage = new Bitmap(podcast.ImageLocalPath);
-            }
-            else
-            {
-                Status = result.Error;
-                SelectedPodcastImage = null;
-            }
-        }
-        catch (Exception e)
-        {
-            // TODO: LOG
-            Status = e.Message;
-        }
-    }
-
     public List<Episode> SelectedPodcastEpisodes => SelectedPodcast?.Episodes.OrderByDescending(e => e.PublishDate).ToList() ?? new List<Episode>();
 
     public Bitmap? SelectedPodcastImage
@@ -192,33 +163,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _searchPodcastCts = new CancellationTokenSource();
             _ = SearchPodcastsAsync(value, _searchPodcastCts);
             OnPropertyChanged(nameof(SearchListBoxIndex));
-        }
-    }
-
-    private async Task SearchPodcastsAsync(string searchValue, CancellationTokenSource cts)
-    {
-        try
-        {
-            var result = await Task.Run(() => _podcastService.SearchPodcast(searchValue));
-            if (cts.IsCancellationRequested) // result is stale, we should ignore it.
-            {
-                return;
-            }
-
-            if (result.IsOk)
-            {
-                SearchPodcasts.Clear();
-                SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
-            }
-            else
-            {
-                Status = result.Error;
-            }
-        }
-        catch (Exception e)
-        {
-            // TODO: LOG
-            Status = e.Message;
         }
     }
 
@@ -336,6 +280,35 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             }
 
             return string.Empty;
+        }
+    }
+
+    private async Task DownloadPodcastImageAsync(Podcast podcast, CancellationTokenSource cts)
+    {
+        try
+        {
+            var result = await Task.Run(() => _podcastService.DownloadImage(podcast));
+            if (cts.IsCancellationRequested) //result is stale, user selected another podcast already.
+            {
+                return;
+            }
+
+            if (result.IsOk)
+            {
+                podcast.ImageLocalPath = result.Value;
+                await _podcastService.SaveToDisk(Podcasts);
+                SelectedPodcastImage = new Bitmap(podcast.ImageLocalPath);
+            }
+            else
+            {
+                Status = result.Error;
+                SelectedPodcastImage = null;
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO: LOG
+            Status = e.Message;
         }
     }
 
@@ -585,6 +558,33 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
 
         SelectedEpisode = _playingEpisode.Podcast.Episodes.FirstOrDefault();
+    }
+
+    private async Task SearchPodcastsAsync(string searchValue, CancellationTokenSource cts)
+    {
+        try
+        {
+            var result = await Task.Run(() => _podcastService.SearchPodcast(searchValue));
+            if (cts.IsCancellationRequested) // result is stale, we should ignore it.
+            {
+                return;
+            }
+
+            if (result.IsOk)
+            {
+                SearchPodcasts.Clear();
+                SearchPodcasts.AddRange(result.Value.OrderBy(x => x.Name));
+            }
+            else
+            {
+                Status = result.Error;
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO: LOG
+            Status = e.Message;
+        }
     }
 
     [RelayCommand]
