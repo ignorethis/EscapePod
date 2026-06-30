@@ -178,21 +178,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             _statusCts?.Cancel();
             _statusCts = new CancellationTokenSource();
-            var cts = _statusCts;
             OnPropertyChanged(nameof(StatusPanelVisible));
 
-            Task
-                .Delay(TimeSpan.FromSeconds(5), cts.Token)
-                .ContinueWith(_ =>
-                {
-                    if (cts.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    SetProperty(ref _status, string.Empty);
-                    OnPropertyChanged(nameof(StatusPanelVisible));
-                });
+            _ = ClearStatusAsync(_statusCts);
         }
     }
     public bool StatusPanelVisible => !string.IsNullOrEmpty(_status);
@@ -281,6 +269,21 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             return string.Empty;
         }
+    }
+
+    private async Task ClearStatusAsync(CancellationTokenSource cts)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5), cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        SetProperty(ref _status, string.Empty);
+        OnPropertyChanged(nameof(StatusPanelVisible));
     }
 
     private async Task DownloadPodcastImageAsync(Podcast podcast, CancellationTokenSource cts)
