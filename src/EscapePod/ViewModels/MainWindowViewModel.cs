@@ -81,37 +81,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
                     {
                         _selectedPodcastDownloadImageCts?.Cancel();
                         _selectedPodcastDownloadImageCts = new CancellationTokenSource();
-                        var cts = _selectedPodcastDownloadImageCts;
-                        Task.Run(async () =>
-                        {
-                            try
-                            {
-                                var result = await _podcastService.DownloadImage(value).ConfigureAwait(false);
-                                if (cts.IsCancellationRequested) //result is stale, user selected another podcast already.
-                                {
-                                    return;
-                                }
-
-                                if (result.IsOk)
-                                {
-                                    value.ImageLocalPath = result.Value;
-                                    await _podcastService.SaveToDisk(Podcasts);
-                                    SelectedPodcastImage = new Bitmap(value.ImageLocalPath);
-                                }
-                                else
-                                {
-                                    Status = result.Error;
-                                    SelectedPodcastImage = null;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                // TODO: LOG
-                                Status = e.Message;
-                            }
-
-                            OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
-                        });
+                        _ = DownloadPodcastImageAsync(value, _selectedPodcastDownloadImageCts);
                     }
                 }
                 else
@@ -123,6 +93,35 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(SelectedPodcastPanelVisible));
             OnPropertyChanged(nameof(DescriptionHtml));
             OnPropertyChanged(nameof(SelectedPodcastEpisodes));
+        }
+    }
+
+    private async Task DownloadPodcastImageAsync(Podcast podcast, CancellationTokenSource cts)
+    {
+        try
+        {
+            var result = await Task.Run(() => _podcastService.DownloadImage(podcast));
+            if (cts.IsCancellationRequested) //result is stale, user selected another podcast already.
+            {
+                return;
+            }
+
+            if (result.IsOk)
+            {
+                podcast.ImageLocalPath = result.Value;
+                await _podcastService.SaveToDisk(Podcasts);
+                SelectedPodcastImage = new Bitmap(podcast.ImageLocalPath);
+            }
+            else
+            {
+                Status = result.Error;
+                SelectedPodcastImage = null;
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO: LOG
+            Status = e.Message;
         }
     }
 
