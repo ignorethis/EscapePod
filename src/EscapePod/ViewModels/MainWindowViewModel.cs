@@ -541,7 +541,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     public void SelectFirstEpisode()
     {
-        if (_playingEpisode is null)
+        if (_playingEpisode?.Podcast is null)
         {
             return;
         }
@@ -552,7 +552,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     public void SelectLastEpisode()
     {
-        if (_playingEpisode is null)
+        if (_playingEpisode?.Podcast is null)
         {
             return;
         }
