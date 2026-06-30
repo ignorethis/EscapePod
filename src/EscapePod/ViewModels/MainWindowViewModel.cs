@@ -511,9 +511,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
 
         //altdaten updaten
-        var podcastsByUri = Podcasts.ToDictionary(p => p.PodcastUri);
+        var podcastsByUri = Podcasts.Where(p => p.PodcastUri is not null).ToDictionary(p => p.PodcastUri!);
         foreach (var updatedPodcast in updatedPodcasts)
         {
+            if (updatedPodcast.PodcastUri is null)
+            {
+                continue;
+            }
+
             var oldPodcastFound = podcastsByUri.TryGetValue(updatedPodcast.PodcastUri, out Podcast? podcast);
             if (!oldPodcastFound || podcast is null)
             {
@@ -522,9 +527,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             podcast.ApplyUpdate(updatedPodcast);
 
-            var episodesByUri = podcast.Episodes.ToDictionary(e => e.EpisodeUri);
+            var episodesByUri = podcast.Episodes.Where(e => e.EpisodeUri is not null).ToDictionary(e => e.EpisodeUri!);
             foreach (var updatedEpisode in updatedPodcast.Episodes)
             {
+                if (updatedEpisode.EpisodeUri is null)
+                {
+                    continue;
+                }
+
                 var oldEpisodeFound = episodesByUri.TryGetValue(updatedEpisode.EpisodeUri, out Episode? episode);
                 if (oldEpisodeFound && episode is not null)
                 {
